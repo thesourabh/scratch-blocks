@@ -33,6 +33,8 @@ goog.provide('Blockly.ContextMenu');
 goog.require('Blockly.utils');
 goog.require('Blockly.utils.uiMenu');
 
+goog.require('Blockly.RefactorUtils'); 
+
 goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.style');
@@ -400,6 +402,23 @@ Blockly.ContextMenu.wsExpandOption = function(hasCollapsedBlocks, topBlocks) {
       Blockly.ContextMenu.toggleCollapseFn_(topBlocks, false);
     }
   };
+};
+
+/*
+ * Make a context menu option for Introduce Variable
+ */
+Blockly.ContextMenu.introduceVariableOption = function(block) { 
+  var introduceVarOption = { 
+    text: 'Introduce variable', 
+    enabled: true, 
+    callback: function() { 
+      console.log('TODO introduce variable'); 
+      var transformationSeq = Blockly.RefactorUtils.introduceVariable(block); 
+      Blockly.RefactorUtils.performTransformation(transformationSeq); 
+    } 
+  }; 
+   
+  return introduceVarOption; 
 };
 
 // End helper functions for creating context menu options.
