@@ -5,66 +5,59 @@ goog.provide('Blockly.BlockSvg.RefactoringGesture');
 goog.require('Blockly.RefactoringManager');
 goog.require('Blockly.BlockSvg');
 goog.require('Blockly.RefactoringUtils'); 
-/*
- * need to extend block_svg.js
- * 
- */
 
-
-
-// A flyout connected to a workspace doesn't have its own current gesture.
-//	this.workspace.getGesture = this.targetWorkspace_.getGesture.bind(this.targetWorkspace_);
-
-// Blockly.BlockSvg.prototype.duplicateAndDragCallback_ = function() {
-
-
-Blockly.BlockSvg.prototype.CtrlDrag = function() {};
+// a modification of Blockly.BlockSvg.prototype.duplicateAndDragCallback
 
 
 Blockly.BlockSvg.prototype.extractExpAndDragCallback = function() {
-	var oldBlock = this;
+	var expBlock = this;
 	return function(e) {
 		// Give the context menu a chance to close.
 		setTimeout(function() {
-			console.log("let's do the drag");
-			
-			var ws = oldBlock.workspace;
-			var svgRootOld = oldBlock.getSvgRoot();
+			var ws = expBlock.workspace;
+			var svgRootOld = expBlock.getSvgRoot();
 			if (!svgRootOld) {
-				throw new Error('oldBlock is not rendered.');
+				throw new Error('expBlock is not rendered.');
 			}
-
-			// declare var
-			var transformationSeq = Blockly.RefactoringUtils.introduceVariable(oldBlock);
-			Blockly.RefactoringUtils.performTransformation(transformationSeq);
-			
-			// create a variable assignment
 			ws.setResizesEnabled(false);
 			
-			var blockDom = Blockly.RefactoringUtils.addVarBlock();
-			
-			var newBlock = Blockly.Xml.domToBlock(blockDom, ws);
-			newBlock.setFieldValue('temp','VARIABLE');
-			
-			// Scratch-specific: Give shadow dom new IDs to prevent duplicating on paste
-			// Blockly.utils.changeObscuredShadowIds(newBlock);
+			// declare var
 
-			var svgRootNew = newBlock.getSvgRoot();
-			if (!svgRootNew) {
-				throw new Error('newBlock is not rendered.');
-			}
+			var json = Blockly.RefactoringUtils.constructNewVariableEventJSON_("temp", workspace.id);
+			var varCreateEvent = Blockly.RefactoringUtils.constructNewVariableEvent(json);
+			varCreateEvent.run(true);
+			
+			// create a variable assignment
+			
+			
+			// set var block
+			ws.setResizesEnabled(false);
+			var setVarBlock = Blockly.RefactoringUtils.createSetVar('temp');
+			Blockly.RefactoringUtils.setInputName(setVarBlock, 'VALUE', expBlock);	//this will duplicate
 
+			// replace all expressions with the var
+			// idenfity connection
+			var parentConnection = expBlock.outputConnection.targetConnection;
+			expBlock.unplug(true,true);
+			
+			var varReadExpBlock = Blockly.RefactoringUtils.createVarRead('temp');
+			parentConnection.connect(varReadExpBlock.outputConnection);
+			
+			
 			// The position of the old block in workspace coordinates.
-			var oldBlockPosWs = oldBlock.getRelativeToSurfaceXY();
+			var expBlockPosWs = expBlock.getRelativeToSurfaceXY();
+			
+			// delete expBlock
+			expBlock.dispose();
 
 			// Place the new block as the same position as the old block.
 			// TODO: Offset by the difference between the mouse position and the upper
 			// left corner of the block.
-			newBlock.moveBy(oldBlockPosWs.x, oldBlockPosWs.y);
+			setVarBlock.moveBy(expBlockPosWs.x, expBlockPosWs.y);
 
 			// The position of the old block in pixels relative to the main
 			// workspace's origin.
-			var oldBlockPosPixels = oldBlockPosWs.scale(ws.scale);
+			var expBlockPosPixels = expBlockPosWs.scale(ws.scale);
 
 			// The offset in pixels between the main workspace's origin and the upper left
 			// corner of the injection div.
@@ -73,7 +66,7 @@ Blockly.BlockSvg.prototype.extractExpAndDragCallback = function() {
 			// The position of the old block in pixels relative to the upper left corner
 			// of the injection div.
 			var finalOffsetPixels = goog.math.Coordinate.sum(mainOffsetPixels,
-				oldBlockPosPixels);
+				expBlockPosPixels);
 
 			var injectionDiv = ws.getInjectionDiv();
 			// Bounding rect coordinates are in client coordinates, meaning that they
@@ -98,7 +91,7 @@ Blockly.BlockSvg.prototype.extractExpAndDragCallback = function() {
 				},
 				target : e.target
 			};
-			ws.startDragWithFakeEvent(fakeEvent, newBlock);
+			ws.startDragWithFakeEvent(fakeEvent, setVarBlock);
 		}, 0);
 	};
 };
