@@ -498,6 +498,19 @@ Blockly.Connection.prototype.connect = function(otherConnection) {
     // Already connected together.  NOP.
     return;
   }
+  
+  //refactoring
+  var refacManager = this.sourceBlock_.workspace.refactoringManager;
+  //determin if location is valid
+  var isValid = refacManager.queryPostCondition(otherConnection.sourceBlock_);
+  if(refacManager.inProgress && !isValid){
+	  //how to handle this properly?
+	  //needs to be the var assignment block not just any
+	  console.log('should not connect');
+	  
+	  return;
+  }
+  
   this.checkConnection_(otherConnection);
   // Determine which block is superior (higher in the source stack).
   if (this.isSuperior()) {
@@ -507,6 +520,13 @@ Blockly.Connection.prototype.connect = function(otherConnection) {
     // Inferior block.
     otherConnection.connect_(this);
   }
+  
+  //refactoring
+  if(refacManager.inProgress){
+    refacManager.inProgress = false;
+    console.log('end refactoring');
+  }
+
 };
 
 /**
