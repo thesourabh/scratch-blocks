@@ -1,15 +1,15 @@
 'use strict';
 
-goog.provide('Blockly.RefactorUtils');
+goog.provide('Blockly.RefactoringUtils');
 
-Blockly.RefactorUtils.introduceVariable = function(block) {
-	console.log("calling Blockly.RefactorUtils");
+Blockly.RefactoringUtils.introduceVariable = function(block) {
+	console.log("calling Blockly.RefactoringUtils");
 	//analyze and generate sequence of transformation as Blockly.Events 
 
 	var transformations = [];
 	//hard-coded 
 
-	var varCreateEvent = Blockly.RefactorUtils.constructNewVariableEventJSON_("temp", block.workspace.id);
+	var varCreateEvent = Blockly.RefactoringUtils.constructNewVariableEventJSON_("temp", block.workspace.id);
 	transformations.push(varCreateEvent);
 
 	//TODO: insert variable set before its usage 
@@ -21,7 +21,7 @@ Blockly.RefactorUtils.introduceVariable = function(block) {
 	return transformations;
 };
 
-Blockly.RefactorUtils.constructNewVariableEventJSON_ = function(name, wsId) {
+Blockly.RefactoringUtils.constructNewVariableEventJSON_ = function(name, wsId) {
 	var varCreateJson = {
 		type : "var_create",
 		varType : "",
@@ -32,18 +32,18 @@ Blockly.RefactorUtils.constructNewVariableEventJSON_ = function(name, wsId) {
 	return varCreateJson;
 };
 
-Blockly.RefactorUtils.constructNewVariableEvent = function(varCreateJson) {
+Blockly.RefactoringUtils.constructNewVariableEvent = function(varCreateJson) {
 	var varCreateEvent = new Blockly.Events.VarCreate(null);
 	varCreateEvent.fromJson(varCreateJson);
 	varCreateEvent.workspaceId = varCreateJson.workspaceId;
 	return varCreateEvent;
 };
 
-Blockly.RefactorUtils.performTransformation = function(transformationSeq) {
+Blockly.RefactoringUtils.performTransformation = function(transformationSeq) {
 	for (var ei = 0; ei < transformationSeq.length; ei++) {
 		var transformationEvent = null;
 		if (transformationSeq[ei].type == 'var_create') {
-			transformationEvent = Blockly.RefactorUtils.constructNewVariableEvent(transformationSeq[ei]);
+			transformationEvent = Blockly.RefactoringUtils.constructNewVariableEvent(transformationSeq[ei]);
 		}
 		if (transformationEvent == null) {
 			return; //unknown transformation event 
@@ -54,7 +54,7 @@ Blockly.RefactorUtils.performTransformation = function(transformationSeq) {
 
 // todo: supply with variable for the shadow menu option
 // todo: make it generalizable as addBlock
-Blockly.RefactorUtils.addVarBlock = function() {
+Blockly.RefactoringUtils.addVarBlock = function() {
 	var blockText = `<xml><block type="data_setvariableto" gap="20">
 	<value name="VARIABLE">
 		<shadow type="data_variablemenu"></shadow>
@@ -70,7 +70,7 @@ Blockly.RefactorUtils.addVarBlock = function() {
 	return block;
 };
 
-Blockly.RefactorUtils.addVarBlock2 = function(varName, blockId) {
+Blockly.RefactoringUtils.addVarBlock2 = function(varName, blockId) {
 	var id = blockId || Blockly.utils.genUid();
 	var blockText = `<xml><block type="data_setvariableto" gap="20">
 		<field name="VARIABLE" id="${id}" variabletype="">${varName}</field>
@@ -86,7 +86,7 @@ Blockly.RefactorUtils.addVarBlock2 = function(varName, blockId) {
 };
 
 
-Blockly.RefactorUtils.removeInput = function(blockInput) {
+Blockly.RefactoringUtils.removeInput = function(blockInput) {
 	//check if shadow block
 	if (blockInput.isShadow()) {
 		var parentBlock = blockInput.getParent();
@@ -106,12 +106,12 @@ Blockly.RefactorUtils.removeInput = function(blockInput) {
 };
 
 
-Blockly.RefactorUtils.removeInputName = function(blockParent, inputName) {
+Blockly.RefactoringUtils.removeInputName = function(blockParent, inputName) {
 	var blockInput = blockParent.getInputTargetBlock(inputName);
 	this.removeInput(blockInput);
 };
 
-Blockly.RefactorUtils.setInputName = function(parentBlock, inputName, childBlock, noInputReplicate) {
+Blockly.RefactoringUtils.setInputName = function(parentBlock, inputName, childBlock, noInputReplicate) {
 	//	childBlock = childBlock || Blockly.Xml.blockToDomWithXY(Blockly.selected);
 	//	console.log(childBlock);
 
@@ -128,7 +128,7 @@ Blockly.RefactorUtils.setInputName = function(parentBlock, inputName, childBlock
 		childBlock = Blockly.Xml.domToBlock(xml, workspace);
 	}
 
-	//	Blockly.RefactorUtils.removeInputName(parentBlock, inputName);
+	//	Blockly.RefactoringUtils.removeInputName(parentBlock, inputName);
 
 	var evt = new Blockly.Events.BlockMove(childBlock);
 	var json = {
@@ -143,13 +143,13 @@ Blockly.RefactorUtils.setInputName = function(parentBlock, inputName, childBlock
 
 };
 
-Blockly.RefactorUtils.createTestExpBlock = function() {
+Blockly.RefactoringUtils.createTestExpBlock = function() {
 	var xml = `<xml><block type="operator_add" id="ab"><value name="NUM1"><shadow type="math_number" id="8f|x6*:cfUhX$U?11K;4"><field name="NUM"></field></shadow></value><value name="NUM2"><shadow type="math_number" id="F5^}i3t|h:njN?1Oz*#^"><field name="NUM"></field></shadow></value></block></xml>`;
 	var dom = Blockly.Xml.textToDom(xml).firstChild;
 	return Blockly.Xml.domToBlock(dom, workspace);
 };
 
-Blockly.RefactorUtils.createTestProgram = function() {
+Blockly.RefactoringUtils.createTestProgram = function() {
 	var text = `<xml xmlns="http://www.w3.org/1999/xhtml">
   <variables></variables>
   <block type="motion_movesteps" id="motion_block" x="67" y="140">
@@ -178,13 +178,13 @@ Blockly.RefactorUtils.createTestProgram = function() {
 };
 
 
-Blockly.RefactorUtils.createSetVar = function(varName) {
-	var setVarDom = Blockly.RefactorUtils.addVarBlock2(varName);
+Blockly.RefactoringUtils.createSetVar = function(varName) {
+	var setVarDom = Blockly.RefactoringUtils.addVarBlock2(varName);
 	var block = Blockly.Xml.domToBlock(setVarDom, workspace);
 	return block;
 };
 
-Blockly.RefactorUtils.varReadDom = function(varName, varId) {
+Blockly.RefactoringUtils.varReadDom = function(varName, varId) {
 	var blockId = Blockly.utils.genUid();
 	varId = varId || Blockly.utils.genUid();
 	var xml = `<xml><block type="data_variable" id="${blockId}" x="0" y="0">
@@ -195,30 +195,30 @@ Blockly.RefactorUtils.varReadDom = function(varName, varId) {
 	return block;
 };
 
-Blockly.RefactorUtils.createVarRead = function(varName) {
-	var varReadDom = Blockly.RefactorUtils.varReadDom(varName);
+Blockly.RefactoringUtils.createVarRead = function(varName) {
+	var varReadDom = Blockly.RefactoringUtils.varReadDom(varName);
 	var block = Blockly.Xml.domToBlock(varReadDom, workspace);
 	return block;
 };
 
 
-Blockly.RefactorUtils.testRefactoring = function() {
+Blockly.RefactoringUtils.testRefactoring = function() {
 	// populate test program
-	Blockly.RefactorUtils.createTestProgram();
+	Blockly.RefactoringUtils.createTestProgram();
 
 	// identify block expression id to extract to a variable
 	var exp_block = workspace.getBlockById('operator_exp_block');
 
 	// declare var
-	var json = Blockly.RefactorUtils.constructNewVariableEventJSON_("temp", workspace.id);
-	var varCreateEvent = Blockly.RefactorUtils.constructNewVariableEvent(json);
+	var json = Blockly.RefactoringUtils.constructNewVariableEventJSON_("temp", workspace.id);
+	var varCreateEvent = Blockly.RefactoringUtils.constructNewVariableEvent(json);
 	varCreateEvent.run(true);
 
 	// set var block
-	var setVarBlock = Blockly.RefactorUtils.createSetVar('temp')
+	var setVarBlock = Blockly.RefactoringUtils.createSetVar('temp')
 
 	
-	Blockly.RefactorUtils.setInputName(setVarBlock, 'VALUE', exp_block);
+	Blockly.RefactoringUtils.setInputName(setVarBlock, 'VALUE', exp_block);
 
 	//replace expression with var
 
@@ -229,8 +229,8 @@ Blockly.RefactorUtils.testRefactoring = function() {
 	//set new parent
 	moveBlock.previousConnection.connect(setVarBlock.nextConnection);
 	
-	var varReadExpBlock = Blockly.RefactorUtils.createVarRead('temp');
-	Blockly.RefactorUtils.setInputName(moveBlock, 'STEPS', varReadExpBlock, true);
+	var varReadExpBlock = Blockly.RefactoringUtils.createVarRead('temp');
+	Blockly.RefactoringUtils.setInputName(moveBlock, 'STEPS', varReadExpBlock, true);
 	exp_block.dispose();
 
 };

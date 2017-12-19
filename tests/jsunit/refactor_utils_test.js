@@ -34,9 +34,9 @@ function test_tearDownWithMockBlocks() {
 function test_variableDeclationEvent() { 
   test_setUpWithMockBlocks();
   var block = new Blockly.Block(workspace, 'some_block'); 
-  var transformationsSeq = Blockly.RefactorUtils.introduceVariable(block);
+  var transformationsSeq = Blockly.RefactoringUtils.introduceVariable(block);
   
-  Blockly.RefactorUtils.performTransformation(transformationsSeq); 
+  Blockly.RefactoringUtils.performTransformation(transformationsSeq); 
   var allVars = workspace.getAllVariables(); 
   assertEquals("should find a variable temp", 1, allVars.length); 
   test_tearDownWithMockBlocks(); 

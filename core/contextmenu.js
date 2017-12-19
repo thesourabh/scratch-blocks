@@ -33,7 +33,7 @@ goog.provide('Blockly.ContextMenu');
 goog.require('Blockly.utils');
 goog.require('Blockly.utils.uiMenu');
 
-goog.require('Blockly.RefactorUtils'); 
+goog.require('Blockly.RefactoringUtils'); 
 
 goog.require('goog.dom');
 goog.require('goog.events');

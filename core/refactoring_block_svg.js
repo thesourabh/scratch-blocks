@@ -4,7 +4,7 @@ goog.provide('Blockly.BlockSvg.RefactoringGesture');
 
 goog.require('Blockly.RefactoringManager');
 goog.require('Blockly.BlockSvg');
-goog.require('Blockly.RefactorUtils'); 
+goog.require('Blockly.RefactoringUtils'); 
 /*
  * need to extend block_svg.js
  * 
@@ -35,13 +35,13 @@ Blockly.BlockSvg.prototype.extractExpAndDragCallback = function() {
 			}
 
 			// declare var
-			var transformationSeq = Blockly.RefactorUtils.introduceVariable(oldBlock);
-			Blockly.RefactorUtils.performTransformation(transformationSeq);
+			var transformationSeq = Blockly.RefactoringUtils.introduceVariable(oldBlock);
+			Blockly.RefactoringUtils.performTransformation(transformationSeq);
 			
 			// create a variable assignment
 			ws.setResizesEnabled(false);
 			
-			var blockDom = Blockly.RefactorUtils.addVarBlock();
+			var blockDom = Blockly.RefactoringUtils.addVarBlock();
 			
 			var newBlock = Blockly.Xml.domToBlock(blockDom, ws);
 			newBlock.setFieldValue('temp','VARIABLE');

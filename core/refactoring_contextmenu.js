@@ -12,8 +12,8 @@ Blockly.ContextMenu.introduceVariableOption2 = function(block) {
 		enabled : true,
 		callback : function() {
 			console.log('TODO introduce variable');
-			var transformationSeq = Blockly.RefactorUtils.introduceVariable(block);
-			Blockly.RefactorUtils.performTransformation(transformationSeq);
+			var transformationSeq = Blockly.RefactoringUtils.introduceVariable(block);
+			Blockly.RefactoringUtils.performTransformation(transformationSeq);
 		}
 	};
 
