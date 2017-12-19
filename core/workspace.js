@@ -27,6 +27,7 @@
 goog.provide('Blockly.Workspace');
 
 goog.require('Blockly.VariableMap');
+goog.require('Blockly.RefactoringManager');
 goog.require('goog.array');
 goog.require('goog.math');
 
@@ -102,6 +103,9 @@ Blockly.Workspace = function(opt_options) {
    * @private
    */
   this.potentialVariableMap_ = null;
+  
+  
+  this.refactoringManager = new Blockly.RefactoringManager();
 };
 
 /**

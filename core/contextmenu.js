@@ -404,21 +404,3 @@ Blockly.ContextMenu.wsExpandOption = function(hasCollapsedBlocks, topBlocks) {
   };
 };
 
-/*
- * Make a context menu option for Introduce Variable
- */
-Blockly.ContextMenu.introduceVariableOption = function(block) { 
-  var introduceVarOption = { 
-    text: 'Introduce variable', 
-    enabled: true, 
-    callback: function() { 
-      console.log('TODO introduce variable'); 
-      var transformationSeq = Blockly.RefactorUtils.introduceVariable(block); 
-      Blockly.RefactorUtils.performTransformation(transformationSeq); 
-    } 
-  }; 
-   
-  return introduceVarOption; 
-};
-
-// End helper functions for creating context menu options.
