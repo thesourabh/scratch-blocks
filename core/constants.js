@@ -48,7 +48,7 @@ Blockly.SNAP_RADIUS = 48;
  * Maximum misalignment between connections for them to snap together,
  * when a connection is already highlighted.
  */
-Blockly.CONNECTING_SNAP_RADIUS = 96;
+Blockly.CONNECTING_SNAP_RADIUS = 68;
 
 /**
  * How much to prefer staying connected to the current connection over moving to
@@ -268,6 +268,7 @@ Blockly.Categories = {
   "sound": "sounds",
   "pen": "pen",
   "data": "data",
+  "dataLists": "data-lists",
   "event": "events",
   "control": "control",
   "sensing": "sensing",
@@ -342,7 +343,15 @@ Blockly.NEW_BROADCAST_MESSAGE_ID = 'NEW_BROADCAST_MESSAGE_ID';
  * indicates that the current variable is a broadcast message.
  * @const {string}
  */
-Blockly.BROADCAST_MESSAGE_TYPE = 'broadcast_msg';
+Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE = 'broadcast_msg';
+
+/**
+ * String representing the variable type of list blocks.
+ * This string, for use in differentiating between types of variables,
+ * indicates that the current variable is a list.
+ * @const {string}
+ */
+Blockly.LIST_VARIABLE_TYPE = 'list';
 
 /**
  * The type of all procedure definition blocks.
