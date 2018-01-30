@@ -204,6 +204,7 @@ class Gen_compressed(threading.Thread):
         ("output_info", "warnings"),
         ("output_info", "errors"),
         ("output_info", "statistics"),
+        ("formatting", "PRETTY_PRINT")
       ]
 
     # Read in all the source files.
