@@ -90,6 +90,11 @@
           state = sessionStorage.getItem('logFlyoutEvents');
           logFlyoutEvents(Boolean(state));
         }
+
+          // listener
+        workspace.addChangeListener(Blockly.RemoteMsg.listener);
+          //create a test program
+        Blockly.RefactoringUtils.createTestProgram(workspace);
       }
 
       function getToolboxElement() {

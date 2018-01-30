@@ -1,6 +1,13 @@
 'use strict';
 
 goog.provide('Blockly.RefactoringUtils');
+goog.require('Blockly.utils');
+goog.require('Blockly.Xml');
+goog.require('Blockly.Events');
+goog.require('Blockly.Connection');
+goog.require('Blockly.RemoteMsg');
+
+
 
 Blockly.RefactoringUtils.introduceVariable = function(block) {
 	console.log("calling Blockly.RefactoringUtils");
@@ -9,7 +16,7 @@ Blockly.RefactoringUtils.introduceVariable = function(block) {
 	var transformations = [];
 	//hard-coded 
 
-	var varCreateEvent = Blockly.RefactoringUtils.constructNewVariableEventJSON_("temp", block.workspace.id);
+	var varCreateEvent = this.constructNewVariableEventJSON_("temp", block.workspace.id);
 	transformations.push(varCreateEvent);
 
 	//TODO: insert variable set before its usage 
@@ -43,7 +50,7 @@ Blockly.RefactoringUtils.performTransformation = function(transformationSeq) {
 	for (var ei = 0; ei < transformationSeq.length; ei++) {
 		var transformationEvent = null;
 		if (transformationSeq[ei].type == 'var_create') {
-			transformationEvent = Blockly.RefactoringUtils.constructNewVariableEvent(transformationSeq[ei]);
+			transformationEvent = this.constructNewVariableEvent(transformationSeq[ei]);
 		}
 		if (transformationEvent == null) {
 			return; //unknown transformation event 
@@ -54,26 +61,11 @@ Blockly.RefactoringUtils.performTransformation = function(transformationSeq) {
 
 // todo: supply with variable for the shadow menu option
 // todo: make it generalizable as addBlock
-Blockly.RefactoringUtils.addVarBlock = function() {
-	var blockText = `<xml><block type="data_setvariableto" gap="20">
-	<value name="VARIABLE">
-		<shadow type="data_variablemenu"></shadow>
-	</value>
-	<value name="VALUE">
-		<shadow type="text">
-			<field name="TEXT">0</field>
-		</shadow>
-	</value>
-</block></xml>`;
-
-	var block = Blockly.Xml.textToDom(blockText).firstChild;
-	return block;
-};
-
-Blockly.RefactoringUtils.addVarBlock2 = function(varName, blockId) {
+Blockly.RefactoringUtils.addVarBlock = function(varName, blockId) {
 	var id = blockId || Blockly.utils.genUid();
-	var blockText = `<xml><block type="data_setvariableto" gap="20">
-		<field name="VARIABLE" id="${id}" variabletype="">${varName}</field>
+	var fieldId = Blockly.utils.genUid();
+	var blockText = `<xml><block type="data_setvariableto" id="${id}" gap="20">
+		<field name="VARIABLE" id="${fieldId}" variabletype="">${varName}</field>
 	<value name="VALUE">
 		<shadow type="text">
 			<field name="TEXT">0</field>
@@ -112,9 +104,10 @@ Blockly.RefactoringUtils.removeInputName = function(blockParent, inputName) {
 };
 
 Blockly.RefactoringUtils.setInputName = function(parentBlock, inputName, childBlock, noInputReplicate) {
+   console.log("calling atmosphere: "+Blockly.RemoteMsg.info);
 	//	childBlock = childBlock || Blockly.Xml.blockToDomWithXY(Blockly.selected);
 	//	console.log(childBlock);
-
+	var workspace = parentBlock.workspace;
 
 	Blockly.Events.setGroup(true);
 
@@ -149,7 +142,7 @@ Blockly.RefactoringUtils.createTestExpBlock = function() {
 	return Blockly.Xml.domToBlock(dom, workspace);
 };
 
-Blockly.RefactoringUtils.createTestProgram = function() {
+Blockly.RefactoringUtils.createTestProgram = function(workspace) {
 	var text = `<xml xmlns="http://www.w3.org/1999/xhtml">
   <variables></variables>
   <block type="motion_movesteps" id="motion_block" x="67" y="140">
@@ -177,34 +170,22 @@ Blockly.RefactoringUtils.createTestProgram = function() {
 	Blockly.Xml.domToWorkspace(xml, workspace);
 };
 
+// how to create a program
+Blockly.RefactoringUtils.createSimpleProgram = function(workspace) {
+	var text = `<xml xmlns="http://www.w3.org/1999/xhtml">
+  <variables></variables>
+  <block type="event_whenflagclicked" id="_nKq%.w5@{J*(Crol.6E" x="161" y="37"></block>
+</xml>`;
 
-Blockly.RefactoringUtils.createSetVar = function(varName) {
-	var setVarDom = Blockly.RefactoringUtils.addVarBlock2(varName);
-	var block = Blockly.Xml.domToBlock(setVarDom, workspace);
-	return block;
-};
-
-Blockly.RefactoringUtils.varReadDom = function(varName, varId) {
-	var blockId = Blockly.utils.genUid();
-	varId = varId || Blockly.utils.genUid();
-	var xml = `<xml><block type="data_variable" id="${blockId}" x="0" y="0">
-						<field name="VARIABLE" id="${varId}" variabletype="">${varName}</field>
-					</block>
-				</xml>`;
-	var block = Blockly.Xml.textToDom(xml).firstChild;
-	return block;
-};
-
-Blockly.RefactoringUtils.createVarRead = function(varName) {
-	var varReadDom = Blockly.RefactoringUtils.varReadDom(varName);
-	var block = Blockly.Xml.domToBlock(varReadDom, workspace);
-	return block;
+	var xml = Blockly.Xml.textToDom(text);
+	Blockly.Xml.domToWorkspace(xml, workspace);
 };
 
 
-Blockly.RefactoringUtils.testRefactoring = function() {
+Blockly.RefactoringUtils.testRefactoring = function(workspace) {
+	console.log(workspace);
 	// populate test program
-	Blockly.RefactoringUtils.createTestProgram();
+	Blockly.RefactoringUtils.createTestProgram(workspace);
 
 	// identify block expression id to extract to a variable
 	var exp_block = workspace.getBlockById('operator_exp_block');
@@ -215,7 +196,7 @@ Blockly.RefactoringUtils.testRefactoring = function() {
 	varCreateEvent.run(true);
 
 	// set var block
-	var setVarBlock = Blockly.RefactoringUtils.createSetVar('temp')
+	var setVarBlock = Blockly.RefactoringUtils.createSetVar_('temp', workspace.id);
 
 	
 	Blockly.RefactoringUtils.setInputName(setVarBlock, 'VALUE', exp_block);
@@ -233,4 +214,102 @@ Blockly.RefactoringUtils.testRefactoring = function() {
 	Blockly.RefactoringUtils.setInputName(moveBlock, 'STEPS', varReadExpBlock, true);
 	exp_block.dispose();
 
+};
+
+
+Blockly.RefactoringUtils.VarDeclare = function(json_event){
+	var json = Blockly.RefactoringUtils.constructNewVariableEventJSON_(json_event.var_name, json_event.ws_id);
+    var varCreateEvent = Blockly.RefactoringUtils.constructNewVariableEvent(json);
+    varCreateEvent.run(true);
+};
+
+Blockly.RefactoringUtils.VarAssign = function(assignVarJSON){
+	var ws = Blockly.Workspace.getById(assignVarJSON['ws_id']);
+	var expBlock = ws.getBlockById(assignVarJSON['value']); //todo get block from id
+	var setVarBlock = Blockly.RefactoringUtils.createSetVar_(
+		assignVarJSON['var_name'],
+		assignVarJSON['block_id'],
+		assignVarJSON['ws_id']);
+    Blockly.RefactoringUtils.setInputName(setVarBlock, 'VALUE', expBlock);  //this will duplicate
+    return setVarBlock;
+};
+
+Blockly.RefactoringUtils.varReadDom_ = function(varName, varId, blockId) {
+	var blockId = blockId || Blockly.utils.genUid();
+	varId = varId || Blockly.utils.genUid();
+	var xml = `<xml><block type="data_variable" id="${blockId}" x="0" y="0">
+						<field name="VARIABLE" id="${varId}" variabletype="">${varName}</field>
+					</block>
+				</xml>`;
+	var block = Blockly.Xml.textToDom(xml).firstChild;
+	return block;
+};
+
+Blockly.RefactoringUtils.VarReadBlock = function(createVarReadJSON){
+	var ws = Blockly.Workspace.getById(createVarReadJSON['ws_id']);
+	var varReadDom = Blockly.RefactoringUtils.varReadDom_(
+		createVarReadJSON['var_name'],
+		null,
+		createVarReadJSON['block_id']);
+	var block = Blockly.Xml.domToBlock(varReadDom, ws);
+	return block;
+};
+
+Blockly.RefactoringUtils.createSetVar_ = function(varName, block_id, wsId) {
+	var ws = Blockly.Workspace.getById(wsId);	
+	var setVarDom = Blockly.RefactoringUtils.addVarBlock(varName,block_id);
+	var block = Blockly.Xml.domToBlock(setVarDom, ws);
+	return block;
+};
+
+
+Blockly.RefactoringUtils.ReplaceValue = function(replaceValueJSON){
+	var ws = Blockly.Workspace.getById(replaceValueJSON['ws_id']);
+	var oldValue = ws.getBlockById(replaceValueJSON['old_value']);
+	var newValue = ws.getBlockById(replaceValueJSON['new_value']);
+
+	// replace new with old
+	// idenfity connection
+	var parentConnection = oldValue.outputConnection.targetConnection;
+	oldValue.unplug(true,true);
+
+	parentConnection.connect(newValue.outputConnection);
+
+	// delete old value
+	oldValue.dispose();
+};
+
+
+Blockly.RefactoringUtils.getTestExtractVarTransformSeq = function(ws_id, exp_block_id){
+	var seq = [
+		{
+	      	'var_name': 'temp',
+	      	'ws_id': ws_id,
+	      	'type': 'declareVar'
+      	},
+      	{
+	      	'var_name' : 'temp',
+	      	'block_id' : 'set_var_id',
+	      	'ws_id' : ws_id,
+	      	'value' : exp_block_id,
+	      	'type': 'assignVar'
+      	},
+      	{
+	      	'block_id' : 'var_temp_id',
+	      	'var_name' : 'temp',
+	      	'ws_id' : ws_id,
+	      	'px' : 0,
+	      	'py' : 0,
+	      	'type': 'varReadBlock'
+      	},
+      	{
+	      	'ws_id' : ws_id,
+	      	'old_value' : exp_block_id,
+	      	'new_value' : 'var_temp_id',
+	      	'type' : 'replaceValue'
+      	}
+
+	];
+
+	return seq;
 };

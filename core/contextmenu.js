@@ -41,6 +41,7 @@ goog.require('goog.style');
 goog.require('goog.ui.Menu');
 goog.require('goog.ui.MenuItem');
 
+goog.require('Blockly.RefactoringManager');
 
 /**
  * Which block is the context menu attached to?
@@ -402,5 +403,16 @@ Blockly.ContextMenu.wsExpandOption = function(hasCollapsedBlocks, topBlocks) {
       Blockly.ContextMenu.toggleCollapseFn_(topBlocks, false);
     }
   };
+};
+
+
+Blockly.ContextMenu.introduceVariableOption = function(block) {
+  var introduceVarOption = {
+    text : 'Introduce variable',
+    enabled : true,
+    callback : Blockly.RefactoringManager.extractExpAndDragCallback(block)
+  };
+
+  return introduceVarOption;
 };
 

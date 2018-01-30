@@ -105,8 +105,12 @@
           logFlyoutEvents(Boolean(state));
         }
         
-        //create a test program
-    	Blockly.RefactoringUtils.createTestProgram();
+        //remote refactoring engine
+        Blockly.RemoteMsg.connect(); //establish remote connection 
+        workspace.addChangeListener(Blockly.RemoteMsg.listener);
+          //create a test program
+        // Blockly.RefactoringUtils.createTestProgram(workspace);
+        Blockly.RefactoringUtils.createSimpleProgram(workspace);
       }
 
       function getToolboxElement() {
