@@ -667,19 +667,19 @@ Blockly.InsertionMarkerManager.prototype.connectMarker_ = function() {
 
 Blockly.InsertionMarkerManager.prototype.refactoringMarkerRender = function(imBlock) {
 	//Refactoring
-	  var refManager = this.workspace_.refactoringManager;
-	  var isValid = refManager.isValid(this.block);
-	  var inProgress = refManager.inProgress;
-	  if(inProgress){
-		  if(isValid){
-			  imBlock.svgPath_.setAttribute('fill', '#57a800');
-			  imBlock.svgPath_.setAttribute('fill-opacity', 0.6);
-			  //TODO: shows red cross
-		  } else{
-			  imBlock.svgPath_.setAttribute('fill', '#a82e01');
-			  imBlock.svgPath_.setAttribute('fill-opacity', 0.6);
-		  }
-	  }
+	  // var refManager = this.workspace_.refactoringManager;
+	  // var isValid = refManager.isValid(this.block);
+	  // var inProgress = refManager.inProgress;
+	  // if(inProgress){
+		 //  if(isValid){
+			//   imBlock.svgPath_.setAttribute('fill', '#57a800');
+			//   imBlock.svgPath_.setAttribute('fill-opacity', 0.6);
+			//   //TODO: shows red cross
+		 //  } else{
+			//   imBlock.svgPath_.setAttribute('fill', '#a82e01');
+			//   imBlock.svgPath_.setAttribute('fill-opacity', 0.6);
+		 //  }
+	  // }
 };
 
 /**** End insertion marker display functions ****/

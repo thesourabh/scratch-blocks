@@ -755,8 +755,6 @@ Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {
 
   menuOptions.push(Blockly.ContextMenu.blockHelpOption(block));
   
-  //example: add refactoring option when right click add block
-  menuOptions.push(Blockly.ContextMenu.introduceVariableOption(block)); 
 
   //refactoring
   menuOptions.push(Blockly.ContextMenu.introduceVariableOption(block)); 

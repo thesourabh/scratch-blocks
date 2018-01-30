@@ -4,6 +4,8 @@ goog.provide('Blockly.RefactoringManager');
 
 goog.require('Blockly.RefactoringUtils'); 
 
+Blockly.RefactoringManager = function(){};
+
 Blockly.RefactoringManager.extractExpAndDragCallback = function(block) {
   var expBlock = block;
 
