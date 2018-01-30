@@ -499,17 +499,17 @@ Blockly.Connection.prototype.connect = function(otherConnection) {
     return;
   }
   
-  //refactoring
-  var refacManager = this.sourceBlock_.workspace.refactoringManager;
-  //determin if location is valid
-  var isValid = refacManager.queryPostCondition(otherConnection.sourceBlock_);
-  if(refacManager.inProgress && !isValid){
-	  //how to handle this properly?
-	  //needs to be the var assignment block not just any
-	  console.log('should not connect');
+  // //refactoring
+  // var refacManager = this.sourceBlock_.workspace.refactoringManager;
+  // //determin if location is valid
+  // var isValid = refacManager.queryPostCondition(otherConnection.sourceBlock_);
+  // if(refacManager.inProgress && !isValid){
+	 //  //how to handle this properly?
+	 //  //needs to be the var assignment block not just any
+	 //  console.log('should not connect');
 	  
-	  return;
-  }
+	 //  return;
+  // }
   
   this.checkConnection_(otherConnection);
   // Determine which block is superior (higher in the source stack).
@@ -521,11 +521,11 @@ Blockly.Connection.prototype.connect = function(otherConnection) {
     otherConnection.connect_(this);
   }
   
-  //refactoring
-  if(refacManager.inProgress){
-    refacManager.inProgress = false;
-    console.log('end refactoring');
-  }
+  // //refactoring
+  // if(refacManager.inProgress){
+  //   refacManager.inProgress = false;
+  //   console.log('end refactoring');
+  // }
 
 };
 
