@@ -2,7 +2,7 @@
 
 goog.provide('Blockly.RefactoringManager');
 
-goog.require('Blockly.RefactoringUtils'); 
+goog.require('Blockly.RefactoringUtils');
 
 Blockly.RefactoringManager = function(){};
 
@@ -64,7 +64,7 @@ Blockly.RefactoringManager.extractExpAndDragCallback = function(block) {
       // The position of the old block in workspace coordinates. (for ui control logic)
 
 
-      
+
 
 
       //this is ui logic for initial dragging position of the duplicated block
@@ -99,7 +99,7 @@ Blockly.RefactoringManager.extractExpAndDragCallback = function(block) {
       // e is not a real mouseEvent/touchEvent/pointerEvent.  It's an event
       // created by the context menu and doesn't have the correct coordinates.
       // But it does have some information that we need.
-      
+
       // var fakeEvent = {
       //   clientX : finalOffsetPixels.x + boundingRect.left,
       //   clientY : finalOffsetPixels.y + boundingRect.top,
@@ -128,4 +128,13 @@ Blockly.RefactoringManager.doTransform = function(seq){
 
   //snap setVarBlock above a given block id
 
+};
+
+
+
+Blockly.RefactoringManager.extractSelectedBlocksCallback = function(block) {
+  return function(e) {
+    console.log("hello, here i am");
+
+  }
 };

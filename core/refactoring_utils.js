@@ -11,19 +11,19 @@ goog.require('Blockly.RemoteMsg');
 
 Blockly.RefactoringUtils.introduceVariable = function(block) {
 	console.log("calling Blockly.RefactoringUtils");
-	//analyze and generate sequence of transformation as Blockly.Events 
+	//analyze and generate sequence of transformation as Blockly.Events
 
 	var transformations = [];
-	//hard-coded 
+	//hard-coded
 
 	var varCreateEvent = this.constructNewVariableEventJSON_("temp", block.workspace.id);
 	transformations.push(varCreateEvent);
 
-	//TODO: insert variable set before its usage 
-	//     Blockly.Refactoring.setVarToBlockExp 
+	//TODO: insert variable set before its usage
+	//     Blockly.Refactoring.setVarToBlockExp
 
-	//make a call to refactoring support to get sequence of transformation 
-	//execute the transformation 
+	//make a call to refactoring support to get sequence of transformation
+	//execute the transformation
 
 	return transformations;
 };
@@ -53,7 +53,7 @@ Blockly.RefactoringUtils.performTransformation = function(transformationSeq) {
 			transformationEvent = this.constructNewVariableEvent(transformationSeq[ei]);
 		}
 		if (transformationEvent == null) {
-			return; //unknown transformation event 
+			return; //unknown transformation event
 		}
 		transformationEvent.run(true); //forward
 	}
@@ -112,8 +112,8 @@ Blockly.RefactoringUtils.setInputName = function(parentBlock, inputName, childBl
 	Blockly.Events.setGroup(true);
 
 	childBlock = childBlock || this.createTestExpBlock();
-	
-	
+
+
 	if(!noInputReplicate){
 		// duplicate expression block
 		var xml = Blockly.Xml.blockToDom(childBlock);
@@ -173,9 +173,19 @@ Blockly.RefactoringUtils.createTestProgram = function(workspace) {
 // how to create a program
 Blockly.RefactoringUtils.createSimpleProgram = function(workspace) {
 	var text = `<xml xmlns="http://www.w3.org/1999/xhtml">
-  <variables></variables>
-  <block type="event_whenflagclicked" id="_nKq%.w5@{J*(Crol.6E" x="161" y="37"></block>
-</xml>`;
+                <variables></variables>
+                <block type="event_whenflagclicked" id="abc1" x="165" y="160">
+                  <next>
+                  <block type="motion_pointindirection" id="abc2">
+                    <value name="DIRECTION">
+                      <shadow type="math_angle" id="abc3">
+                        <field name="NUM">90</field>
+                      </shadow>
+                    </value>
+                  </block>
+                  </next>
+                </block>
+              </xml> `;
 
 	var xml = Blockly.Xml.textToDom(text);
 	Blockly.Xml.domToWorkspace(xml, workspace);
@@ -198,7 +208,7 @@ Blockly.RefactoringUtils.testRefactoring = function(workspace) {
 	// set var block
 	var setVarBlock = Blockly.RefactoringUtils.createSetVar_('temp', workspace.id);
 
-	
+
 	Blockly.RefactoringUtils.setInputName(setVarBlock, 'VALUE', exp_block);
 
 	//replace expression with var
@@ -209,7 +219,7 @@ Blockly.RefactoringUtils.testRefactoring = function(workspace) {
 	// connect move block after set var
 	//set new parent
 	moveBlock.previousConnection.connect(setVarBlock.nextConnection);
-	
+
 	var varReadExpBlock = Blockly.RefactoringUtils.createVarRead('temp');
 	Blockly.RefactoringUtils.setInputName(moveBlock, 'STEPS', varReadExpBlock, true);
 	exp_block.dispose();
@@ -256,7 +266,7 @@ Blockly.RefactoringUtils.VarReadBlock = function(createVarReadJSON){
 };
 
 Blockly.RefactoringUtils.createSetVar_ = function(varName, block_id, wsId) {
-	var ws = Blockly.Workspace.getById(wsId);	
+	var ws = Blockly.Workspace.getById(wsId);
 	var setVarDom = Blockly.RefactoringUtils.addVarBlock(varName,block_id);
 	var block = Blockly.Xml.domToBlock(setVarDom, ws);
 	return block;
