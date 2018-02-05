@@ -343,7 +343,13 @@ Blockly.RefactoringUtils.extractSingleBlock = function(expBlock) {
   }
 
 };
+/*
+  Removal of child blocks only works for 0th element. Need it to work for all the elements.
+  Many of the blocks can have operators and data variables as child blocks, which need to be copied without marked too
+  Hence, ignore those during comparisons
 
+  Thoughtprocess : Should I extract all blocks separately and join later or should I filter out unwanted child blocks only
+ */
 Blockly.RefactoringUtils.extractMultipleBlocks = function(expBlock) {
   var oldBlock = expBlock;
   var ws = oldBlock.workspace;
