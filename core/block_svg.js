@@ -759,6 +759,7 @@ Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {
   //refactoring
   menuOptions.push(Blockly.ContextMenu.introduceVariableOption(block));
   menuOptions.push(Blockly.ContextMenu.extractBlocksOption(block));
+  menuOptions.push(Blockly.ContextMenu.markForExtractionOption(block));
 
   // Allow the block to add or modify menuOptions.
   if (this.customContextMenu) {

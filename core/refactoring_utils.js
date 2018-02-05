@@ -323,3 +323,63 @@ Blockly.RefactoringUtils.getTestExtractVarTransformSeq = function(ws_id, exp_blo
 
 	return seq;
 };
+
+Blockly.RefactoringUtils.extractSingleBlock = function(expBlock) {
+  var oldBlock = expBlock;
+  var ws = oldBlock.workspace;
+  var svgRootOld = oldBlock.getSvgRoot();
+  if (!svgRootOld) {
+    throw new Error('oldBlock is not rendered.');
+  }
+
+  console.log(`Creating new block with id ${expBlock.id}`);
+  // Create the new block by cloning the block in the flyout (via XML).
+  var xml = Blockly.Xml.blockToDom(oldBlock);
+  var newBlock = Blockly.Xml.domToBlock(xml, ws);
+
+  var svgRootNew = newBlock.getSvgRoot();
+  if (!svgRootNew) {
+    throw new Error('newBlock is not rendered.');
+  }
+
+};
+
+Blockly.RefactoringUtils.extractMultipleBlocks = function(expBlock) {
+  var oldBlock = expBlock;
+  var ws = oldBlock.workspace;
+  var svgRootOld = oldBlock.getSvgRoot();
+  if (!svgRootOld) {
+    throw new Error('oldBlock is not rendered.');
+  }
+
+
+  if(ws.marks == undefined){
+    throw new Error('No block marked for extraction');
+  }
+
+  let child_blocks_for_copying = [];
+  let rootBlock = ws.marks[0];
+
+
+  for ( var i = 1; i < ws.marks.length; i++  ){
+    if ( rootBlock.childBlocks_[ i-1 ] !== ws.marks[i]  )
+        break;
+    child_blocks_for_copying.push(ws.marks[i]);
+  }
+
+  // let rootBlock_copy = Object.create(rootBlock);
+
+  // used for deep copying
+  let rootBlock_copy = JSON.parse(JSON.stringify(rootBlock));
+
+  rootBlock_copy.childBlocks_ = child_blocks_for_copying;
+
+  Blockly.RefactoringUtils.extractSingleBlock(rootBlock_copy);
+
+  //
+  // for ( let block of blocks_for_copying ) {
+  //   Blockly.RefactoringUtils.extractSingleBlock(block);
+  // }
+
+  ws.marks = undefined;
+};

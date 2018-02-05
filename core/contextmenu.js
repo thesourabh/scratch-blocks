@@ -426,3 +426,13 @@ Blockly.ContextMenu.extractBlocksOption = function(block) {
   return extractBlocksOption;
 };
 
+Blockly.ContextMenu.markForExtractionOption = function(block) {
+  var markForExtractionOption = {
+    text : 'Mark for extraction',
+    enabled : true,
+    callback : Blockly.RefactoringManager.markBlockForExtraction(block)
+  };
+
+  return markForExtractionOption;
+};
+

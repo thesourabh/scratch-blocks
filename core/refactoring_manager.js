@@ -133,8 +133,55 @@ Blockly.RefactoringManager.doTransform = function(seq){
 
 
 Blockly.RefactoringManager.extractSelectedBlocksCallback = function(block) {
+  var expBlock = block;
+
   return function(e) {
-    console.log("hello, here i am");
+    // Give the context menu a chance to close.
+    setTimeout(function() {
+      var ws = expBlock.workspace;
+      var svgRootOld = expBlock.getSvgRoot();
+      if (!svgRootOld) {
+        throw new Error('expBlock is not rendered.');
+      }
+
+      console.log("hello, here i am");
+      console.log(expBlock);
+
+      // Blockly.RefactoringUtils.extractSingleBlock(expBlock);
+      Blockly.RefactoringUtils.extractMultipleBlocks(expBlock);
+
+    }, 0);
+
+
+
+  }
+};
+
+
+
+Blockly.RefactoringManager.markBlockForExtraction = function(block) {
+  var expBlock = block;
+
+  return function(e) {
+    // Give the context menu a chance to close.
+    setTimeout(function() {
+      var ws = expBlock.workspace;
+      var svgRootOld = expBlock.getSvgRoot();
+      if (!svgRootOld) {
+        throw new Error('expBlock is not rendered.');
+      }
+
+      console.log("i am in mark");
+      if( ws.marks == undefined ) {
+        ws.marks = [];
+      }
+
+      ws.marks.push(expBlock);
+      console.log(ws.marks);
+
+    }, 0);
+
+
 
   }
 };
