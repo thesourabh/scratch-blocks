@@ -2,7 +2,7 @@
 
 goog.provide('Blockly.RefactoringManager');
 
-goog.require('Blockly.RefactoringUtils'); 
+goog.require('Blockly.RefactoringUtils');
 
 Blockly.RefactoringManager = function(){};
 
@@ -64,7 +64,7 @@ Blockly.RefactoringManager.extractExpAndDragCallback = function(block) {
       // The position of the old block in workspace coordinates. (for ui control logic)
 
 
-      
+
 
 
       //this is ui logic for initial dragging position of the duplicated block
@@ -99,7 +99,7 @@ Blockly.RefactoringManager.extractExpAndDragCallback = function(block) {
       // e is not a real mouseEvent/touchEvent/pointerEvent.  It's an event
       // created by the context menu and doesn't have the correct coordinates.
       // But it does have some information that we need.
-      
+
       // var fakeEvent = {
       //   clientX : finalOffsetPixels.x + boundingRect.left,
       //   clientY : finalOffsetPixels.y + boundingRect.top,
@@ -128,4 +128,43 @@ Blockly.RefactoringManager.doTransform = function(seq){
 
   //snap setVarBlock above a given block id
 
+};
+
+Blockly.RefactoringManager.markBlockForExtraction = function(block) {
+  var expBlock = block;
+  return function(e) {
+    // Give the context menu a chance to close.
+    setTimeout(function() {
+      var ws = expBlock.workspace;
+      var svgRootOld = expBlock.getSvgRoot();
+      if (!svgRootOld) {
+        throw new Error('expBlock is not rendered.');
+      }
+      //create a new array for marked blocks
+      if( ws.marks == undefined ) {
+        ws.marks = [];
+      }
+      // don't add duplicates of a block in marked
+      if (Blockly.RefactoringUtils.existsIn(block.id, ws.marks) === false) {
+        ws.marks.push(expBlock);
+      }
+      console.log(`Block ${expBlock.id} added to marked`);
+
+    }, 0);
+  }
+};
+
+Blockly.RefactoringManager.extractSelectedBlocksCallback = function(block) {
+  var expBlock = block;
+  return function(e) {
+    // Give the context menu a chance to close.
+    setTimeout(function() {
+      var ws = expBlock.workspace;
+      var svgRootOld = expBlock.getSvgRoot();
+      if (!svgRootOld) {
+        throw new Error('expBlock is not rendered.');
+      }
+      Blockly.RefactoringUtils.extractMarkedBlocks(expBlock);
+    }, 0);
+  }
 };

@@ -33,7 +33,7 @@ goog.provide('Blockly.ContextMenu');
 goog.require('Blockly.utils');
 goog.require('Blockly.utils.uiMenu');
 
-goog.require('Blockly.RefactoringUtils'); 
+goog.require('Blockly.RefactoringUtils');
 
 goog.require('goog.dom');
 goog.require('goog.events');
@@ -414,5 +414,25 @@ Blockly.ContextMenu.introduceVariableOption = function(block) {
   };
 
   return introduceVarOption;
+};
+
+Blockly.ContextMenu.extractBlocksOption = function(block) {
+  var extractBlocksOption = {
+    text : 'Extract Blocks',
+    enabled : true,
+    callback : Blockly.RefactoringManager.extractSelectedBlocksCallback(block)
+  };
+
+  return extractBlocksOption;
+};
+
+Blockly.ContextMenu.markForExtractionOption = function(block) {
+  var markForExtractionOption = {
+    text : 'Mark for extraction',
+    enabled : true,
+    callback : Blockly.RefactoringManager.markBlockForExtraction(block)
+  };
+
+  return markForExtractionOption;
 };
 
