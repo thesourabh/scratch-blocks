@@ -296,26 +296,9 @@ Blockly.Flyout.prototype.init = function(targetWorkspace) {
       this.targetWorkspace_.getGesture.bind(this.targetWorkspace_);
 
   // Get variables from the main workspace rather than the target workspace.
-  this.workspace_.getVariable =
-      this.targetWorkspace_.getVariable.bind(this.targetWorkspace_);
+  this.workspace_.variableMap_  = this.targetWorkspace_.getVariableMap();
 
-  this.workspace_.getVariableById =
-      this.targetWorkspace_.getVariableById.bind(this.targetWorkspace_);
-
-  this.workspace_.getVariablesOfType =
-      this.targetWorkspace_.getVariablesOfType.bind(this.targetWorkspace_);
-
-  this.workspace_.deleteVariable =
-      this.targetWorkspace_.deleteVariable.bind(this.targetWorkspace_);
-
-  this.workspace_.deleteVariableById =
-      this.targetWorkspace_.deleteVariableById.bind(this.targetWorkspace_);
-
-  this.workspace_.renameVariable =
-      this.targetWorkspace_.renameVariable.bind(this.targetWorkspace_);
-
-  this.workspace_.renameVariableById =
-      this.targetWorkspace_.renameVariableById.bind(this.targetWorkspace_);
+  this.workspace_.createPotentialVariableMap();
 };
 
 /**
@@ -630,6 +613,9 @@ Blockly.Flyout.prototype.clearOldBlocks_ = function() {
     button.dispose();
   }
   this.buttons_.length = 0;
+
+  // Clear potential variables from the previous showing.
+  this.workspace_.getPotentialVariableMap().clear();
 };
 
 /**
@@ -694,6 +680,7 @@ Blockly.Flyout.prototype.onMouseDown_ = function(e) {
 Blockly.Flyout.prototype.createBlock = function(originalBlock) {
   var newBlock = null;
   Blockly.Events.disable();
+  var variablesBeforeCreation = this.targetWorkspace_.getAllVariables();
   this.targetWorkspace_.setResizesEnabled(false);
   try {
     newBlock = this.placeNewBlock_(originalBlock);
@@ -703,9 +690,17 @@ Blockly.Flyout.prototype.createBlock = function(originalBlock) {
     Blockly.Events.enable();
   }
 
+  var newVariables = Blockly.Variables.getAddedVariables(this.targetWorkspace_,
+      variablesBeforeCreation);
+
   if (Blockly.Events.isEnabled()) {
     Blockly.Events.setGroup(true);
     Blockly.Events.fire(new Blockly.Events.Create(newBlock));
+    // Fire a VarCreate event for each (if any) new variable created.
+    for(var i = 0; i < newVariables.length; i++) {
+      var thisVariable = newVariables[i];
+      Blockly.Events.fire(new Blockly.Events.VarCreate(thisVariable));
+    }
   }
   if (this.autoClose) {
     this.hide();

@@ -64,6 +64,7 @@ Blockly.RefactoringUtils.performTransformation = function(transformationSeq) {
 Blockly.RefactoringUtils.addVarBlock = function(varName, blockId) {
 	var id = blockId || Blockly.utils.genUid();
 	var fieldId = Blockly.utils.genUid();
+	fieldId = "";
 	var blockText = `<xml><block type="data_setvariableto" id="${id}" gap="20">
 		<field name="VARIABLE" id="${fieldId}" variabletype="">${varName}</field>
 	<value name="VALUE">
@@ -248,9 +249,13 @@ Blockly.RefactoringUtils.varReadDom_ = function(varName, varId, blockId) {
 	var blockId = blockId || Blockly.utils.genUid();
 	varId = varId || Blockly.utils.genUid();
 	var xml = `<xml><block type="data_variable" id="${blockId}" x="0" y="0">
-						<field name="VARIABLE" id="${varId}" variabletype="">${varName}</field>
+						<field name="VARIABLE" variabletype="">${varName}</field>
 					</block>
 				</xml>`;
+
+	//eliminate id <field name="VARIABLE" id = ${varId} variabletype="">${varName}</field> for now
+	//server-side could provide var id when declare and need to make this matched
+	//otherwise scratch-blocks will attempt to lookup by name
 	var block = Blockly.Xml.textToDom(xml).firstChild;
 	return block;
 };
@@ -293,12 +298,12 @@ Blockly.RefactoringUtils.ReplaceValue = function(replaceValueJSON){
 Blockly.RefactoringUtils.getTestExtractVarTransformSeq = function(ws_id, exp_block_id){
 	var seq = [
 		{
-	      	'var_name': 'temp',
+	      	'var_name': 'temp2',
 	      	'ws_id': ws_id,
 	      	'type': 'declareVar'
       	},
       	{
-	      	'var_name' : 'temp',
+	      	'var_name' : 'temp2',
 	      	'block_id' : 'set_var_id',
 	      	'ws_id' : ws_id,
 	      	'value' : exp_block_id,
@@ -306,7 +311,7 @@ Blockly.RefactoringUtils.getTestExtractVarTransformSeq = function(ws_id, exp_blo
       	},
       	{
 	      	'block_id' : 'var_temp_id',
-	      	'var_name' : 'temp',
+	      	'var_name' : 'temp2',
 	      	'ws_id' : ws_id,
 	      	'px' : 0,
 	      	'py' : 0,

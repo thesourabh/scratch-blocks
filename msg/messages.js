@@ -120,15 +120,19 @@ Blockly.Msg.SHOW_PROCEDURE_DEFINITION = 'Go to definition';
 /// prompt - This message is only seen in the Opera browser.  With most browsers, users can edit numeric values in blocks by just clicking and typing.  Opera does not allows this, so we have to open a new window and prompt users with this message to chanage a value.
 Blockly.Msg.CHANGE_VALUE_TITLE = 'Change value:';
 /// dropdown choice - When the user clicks on a variable block, this is one of the dropdown menu choices.  It is used to rename the current variable.  See [https://github.com/google/blockly/wiki/Variables#dropdown-menu https://github.com/google/blockly/wiki/Variables#dropdown-menu].
-Blockly.Msg.RENAME_VARIABLE = 'Rename variable...';
+Blockly.Msg.RENAME_VARIABLE = 'Rename variable';
 /// prompt - Prompts the user to enter the new name for the selected variable.  See [https://github.com/google/blockly/wiki/Variables#dropdown-menu https://github.com/google/blockly/wiki/Variables#dropdown-menu].\n\nParameters:\n* %1 - the name of the variable to be renamed.
 Blockly.Msg.RENAME_VARIABLE_TITLE = 'Rename all "%1" variables to:';
+/// prompt title - Title for the rename variable modal
+Blockly.Msg.RENAME_VARIABLE_MODAL_TITLE = 'Rename Variable';
 
 // Variable creation
 /// button text - Text on the button used to launch the variable creation dialogue.
-Blockly.Msg.NEW_VARIABLE = 'Create variable...';
+Blockly.Msg.NEW_VARIABLE = 'Make a Variable';
 /// prompt - Prompts the user to enter the name for a new variable.  See [https://github.com/google/blockly/wiki/Variables#dropdown-menu https://github.com/google/blockly/wiki/Variables#dropdown-menu].
 Blockly.Msg.NEW_VARIABLE_TITLE = 'New variable name:';
+/// prompt title - Title of the prompt asking the user to enter the name for the new variable.
+Blockly.Msg.VARIABLE_MODAL_TITLE = 'New Variable';
 /// alert - Tells the user that the name they entered is already in use.
 Blockly.Msg.VARIABLE_ALREADY_EXISTS = 'A variable named "%1" already exists.';
 /// alert - Tells the user that the name they entered is already in use for another type.
@@ -138,15 +142,31 @@ Blockly.Msg.PROCEDURE_ALREADY_EXISTS = 'A procedure named "%1" already exists.';
 
 // Custom procedure creation
 /// button text - Text on the button used to launch the procedure creation dialogue.
-Blockly.Msg.NEW_PROCEDURE = 'Make a Block...';
+Blockly.Msg.NEW_PROCEDURE = 'Make a Block';
 
 // List creation
 /// button text - Text on the button used to launch the list creation dialogue.
-Blockly.Msg.NEW_LIST = 'Create list...';
+Blockly.Msg.NEW_LIST = 'Make a List';
+/// prompt - Prompts the user to enter the name for a new list
+Blockly.Msg.NEW_LIST_TITLE = 'New list name:';
+/// prompt title - Title of the prompt asking the user to enter the name for the new list.
+Blockly.Msg.LIST_MODAL_TITLE = 'New List';
+/// alert - Tells the user that the name they entered is already in use.
+Blockly.Msg.LIST_ALREADY_EXISTS = 'A list named "%1" already exists.';
+
+// List renaming
+/// prompt - Prompts the user to enter the new name for the selected list.
+Blockly.Msg.RENAME_LIST_TITLE = 'Rename all "%1" lists to:';
+/// prompt title - Title of the prompt asking the user to rename the list
+Blockly.Msg.RENAME_LIST_MODAL_TITLE = 'Rename List';
 
 // Broadcast Message creation
 /// dropdown choice - Create a new message.
-Blockly.Msg.NEW_BROADCAST_MESSAGE = 'New message...';
+Blockly.Msg.NEW_BROADCAST_MESSAGE = 'New message';
+/// prompt - Prompts the user to enter the name for a new broadcast message
+Blockly.Msg.NEW_BROADCAST_MESSAGE_TITLE = 'New message name:';
+/// prompt title - Title of the prompt asking the user to enter the name for the new message.
+Blockly.Msg.BROADCAST_MODAL_TITLE = 'New Message';
 /// default broadcast message name
 /// (default option in broadcast message dropdown menus)
 Blockly.Msg.DEFAULT_BROADCAST_MESSAGE_NAME = 'message1';
