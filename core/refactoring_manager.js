@@ -130,38 +130,8 @@ Blockly.RefactoringManager.doTransform = function(seq){
 
 };
 
-
-
-Blockly.RefactoringManager.extractSelectedBlocksCallback = function(block) {
-  var expBlock = block;
-
-  return function(e) {
-    // Give the context menu a chance to close.
-    setTimeout(function() {
-      var ws = expBlock.workspace;
-      var svgRootOld = expBlock.getSvgRoot();
-      if (!svgRootOld) {
-        throw new Error('expBlock is not rendered.');
-      }
-
-      console.log("hello, here i am");
-      console.log(expBlock);
-
-      // Blockly.RefactoringUtils.extractSingleBlock(expBlock);
-      Blockly.RefactoringUtils.extractMultipleBlocks(expBlock);
-
-    }, 0);
-
-
-
-  }
-};
-
-
-
 Blockly.RefactoringManager.markBlockForExtraction = function(block) {
   var expBlock = block;
-
   return function(e) {
     // Give the context menu a chance to close.
     setTimeout(function() {
@@ -170,18 +140,31 @@ Blockly.RefactoringManager.markBlockForExtraction = function(block) {
       if (!svgRootOld) {
         throw new Error('expBlock is not rendered.');
       }
-
-      console.log("i am in mark");
+      //create a new array for marked blocks
       if( ws.marks == undefined ) {
         ws.marks = [];
       }
-
-      ws.marks.push(expBlock);
-      console.log(ws.marks);
+      // don't add duplicates of a block in marked
+      if (Blockly.RefactoringUtils.existsIn(block.id, ws.marks) === false) {
+        ws.marks.push(expBlock);
+      }
+      console.log(`Block ${expBlock.id} added to marked`);
 
     }, 0);
+  }
+};
 
-
-
+Blockly.RefactoringManager.extractSelectedBlocksCallback = function(block) {
+  var expBlock = block;
+  return function(e) {
+    // Give the context menu a chance to close.
+    setTimeout(function() {
+      var ws = expBlock.workspace;
+      var svgRootOld = expBlock.getSvgRoot();
+      if (!svgRootOld) {
+        throw new Error('expBlock is not rendered.');
+      }
+      Blockly.RefactoringUtils.extractMarkedBlocks(expBlock);
+    }, 0);
   }
 };

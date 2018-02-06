@@ -324,68 +324,59 @@ Blockly.RefactoringUtils.getTestExtractVarTransformSeq = function(ws_id, exp_blo
 	return seq;
 };
 
-Blockly.RefactoringUtils.extractSingleBlock = function(expBlock) {
-  var oldBlock = expBlock;
-  var ws = oldBlock.workspace;
-  var svgRootOld = oldBlock.getSvgRoot();
-  if (!svgRootOld) {
-    throw new Error('oldBlock is not rendered.');
-  }
-
-  console.log(`Creating new block with id ${expBlock.id}`);
-  // Create the new block by cloning the block in the flyout (via XML).
-  var xml = Blockly.Xml.blockToDom(oldBlock);
-  var newBlock = Blockly.Xml.domToBlock(xml, ws);
-
+Blockly.RefactoringUtils.createExtractedBlocksFromXML = function(rootBlock_xml, ws) {
+  var newBlock = Blockly.Xml.domToBlock(rootBlock_xml, ws);
   var svgRootNew = newBlock.getSvgRoot();
   if (!svgRootNew) {
     throw new Error('newBlock is not rendered.');
   }
-
 };
-/*
-  Removal of child blocks only works for 0th element. Need it to work for all the elements.
-  Many of the blocks can have operators and data variables as child blocks, which need to be copied without marked too
-  Hence, ignore those during comparisons
 
-  Thoughtprocess : Should I extract all blocks separately and join later or should I filter out unwanted child blocks only
+
+/*
+Utility function which checks if an id exists in an iterable/array
  */
-Blockly.RefactoringUtils.extractMultipleBlocks = function(expBlock) {
-  var oldBlock = expBlock;
-  var ws = oldBlock.workspace;
-  var svgRootOld = oldBlock.getSvgRoot();
-  if (!svgRootOld) {
-    throw new Error('oldBlock is not rendered.');
+Blockly.RefactoringUtils.existsIn = function( block_id, marked ) {
+  for  ( let ele of marked   ){
+    if ( ele.id === block_id ){
+      return true;
+    }
   }
 
+  return false; // no match found
+};
+
+
+Blockly.RefactoringUtils.deleteUnmarkedChildBlocks = function( rootBlock_xml, marked ) {
+  console.log("recur");
+  for (var i = 0, child; child = rootBlock_xml.childNodes[i]; i++) {
+    if (child.nodeName.toLowerCase() == 'next') {
+      if (Blockly.RefactoringUtils.existsIn(child.firstChild.id, marked) === false) {
+        rootBlock_xml.removeChild(child);
+      }
+      break;
+    }
+  }
+  for (var i = 0, child; child = rootBlock_xml.childNodes[i]; i++) {
+    Blockly.RefactoringUtils.deleteUnmarkedChildBlocks( child, marked);
+  }
+
+};
+
+Blockly.RefactoringUtils.extractMarkedBlocks = function(expBlock) {
+  var oldBlock = expBlock;
+  var ws = oldBlock.workspace;
 
   if(ws.marks == undefined){
     throw new Error('No block marked for extraction');
   }
+  let rootBlock = ws.marks[0]; //first marked block to be used as root
 
-  let child_blocks_for_copying = [];
-  let rootBlock = ws.marks[0];
+  //converted to xml for copying
+  var rootBlock_copy_xml = Blockly.Xml.blockToDom(rootBlock, false);
+  Blockly.RefactoringUtils.deleteUnmarkedChildBlocks( rootBlock_copy_xml, ws.marks );
+  Blockly.RefactoringUtils.createExtractedBlocksFromXML(rootBlock_copy_xml, ws);
 
-
-  for ( var i = 1; i < ws.marks.length; i++  ){
-    if ( rootBlock.childBlocks_[ i-1 ] !== ws.marks[i]  )
-        break;
-    child_blocks_for_copying.push(ws.marks[i]);
-  }
-
-  // let rootBlock_copy = Object.create(rootBlock);
-
-  // used for deep copying
-  let rootBlock_copy = JSON.parse(JSON.stringify(rootBlock));
-
-  rootBlock_copy.childBlocks_ = child_blocks_for_copying;
-
-  Blockly.RefactoringUtils.extractSingleBlock(rootBlock_copy);
-
-  //
-  // for ( let block of blocks_for_copying ) {
-  //   Blockly.RefactoringUtils.extractSingleBlock(block);
-  // }
-
+  //reset marked blocks to empty
   ws.marks = undefined;
 };
