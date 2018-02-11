@@ -171,6 +171,31 @@ Blockly.RefactoringUtils.createTestProgram = function(workspace) {
 	Blockly.Xml.domToWorkspace(xml, workspace);
 };
 
+
+
+Blockly.RefactoringUtils.createCustomFunctionBlock = function (workspace) {
+  var text = '<xml xmlns="http://www.w3.org/1999/xhtml">   \
+            <variables></variables>                       \
+              <block type="procedures_declaration" id="DIGyU?WYqAi1uD0Y0!Kk" x="169" y="55">  \
+              <mutation proccode="function %s" argumentids="[&quot;isf~[,olVKF`dv_U9_OH&quot;]" argumentnames="[&quot;number or text&quot;]" argumentdefaults="[&quot;todo&quot;]" warp="false"></mutation> \
+              <value name="isf~[,olVKF`dv_U9_OH"> \
+                  <shadow type="argument_editor_string_number" id="-S,+Q+:PgCD.d9yRFY!S"> \
+                  <field name="TEXT">number or text</field> \
+                  </shadow> \
+              </value>  \
+              </block>  \
+            </xml>';
+
+  var xml = Blockly.Xml.textToDom(text);
+  var newBlockId  = Blockly.Xml.domToWorkspace(xml, workspace);
+
+
+  return newBlockId;
+
+};
+
+
+
 // how to create a program
 Blockly.RefactoringUtils.createSimpleProgram = function(workspace) {
 	var text = `<xml xmlns="http://www.w3.org/1999/xhtml">
@@ -335,6 +360,7 @@ Blockly.RefactoringUtils.createExtractedBlocksFromXML = function(rootBlock_xml, 
   if (!svgRootNew) {
     throw new Error('newBlock is not rendered.');
   }
+  return newBlock;
 };
 
 
@@ -380,7 +406,19 @@ Blockly.RefactoringUtils.extractMarkedBlocks = function(expBlock) {
   //converted to xml for copying
   var rootBlock_copy_xml = Blockly.Xml.blockToDom(rootBlock, false);
   Blockly.RefactoringUtils.deleteUnmarkedChildBlocks( rootBlock_copy_xml, ws.marks );
-  Blockly.RefactoringUtils.createExtractedBlocksFromXML(rootBlock_copy_xml, ws);
+  var extractedBlock = Blockly.RefactoringUtils.createExtractedBlocksFromXML(rootBlock_copy_xml, ws);
+
+  // custom function block
+  var function_BlockId = Blockly.RefactoringUtils.createCustomFunctionBlock(ws);
+  var function_block = workspace.getBlockById(function_BlockId);
+
+  if(function_block != null){
+    // connect extracted block to custom block
+    function_block.nextConnection.connect(extractedBlock.previousConnection);
+  }
+  else{
+    console.error("Function BlockId not found");
+  }
 
   //reset marked blocks to empty
   ws.marks = undefined;

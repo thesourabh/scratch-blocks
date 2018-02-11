@@ -500,7 +500,7 @@ developers.google.com/blockly/guides/modify/web/closure""")
   Gen_uncompressed(search_paths_horizontal, False).start()
 
   # Compressed forms of vertical and horizontal.
-  Gen_compressed(search_paths_vertical, search_paths_horizontal).start()
+  #Gen_compressed(search_paths_vertical, search_paths_horizontal).start()
 
   # This is run locally in a separate thread.
   Gen_langfiles().start()
