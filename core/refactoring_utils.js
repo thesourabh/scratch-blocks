@@ -408,12 +408,12 @@ Blockly.RefactoringUtils.extractMarkedBlocks = function(expBlock) {
   Blockly.RefactoringUtils.deleteUnmarkedChildBlocks( rootBlock_copy_xml, ws.marks );
   var extractedBlock = Blockly.RefactoringUtils.createExtractedBlocksFromXML(rootBlock_copy_xml, ws);
 
-  // custom function block
+  // custom function block which will be created
   var function_BlockId = Blockly.RefactoringUtils.createCustomFunctionBlock(ws);
   var function_block = workspace.getBlockById(function_BlockId);
 
   if(function_block != null){
-    // connect extracted block to custom block
+    // connect extracted block to custom block created earlier
     function_block.nextConnection.connect(extractedBlock.previousConnection);
   }
   else{
