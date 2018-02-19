@@ -171,6 +171,31 @@ Blockly.RefactoringUtils.createTestProgram = function(workspace) {
 	Blockly.Xml.domToWorkspace(xml, workspace);
 };
 
+
+
+Blockly.RefactoringUtils.createCustomFunctionBlock = function (workspace) {
+  var text = '<xml xmlns="http://www.w3.org/1999/xhtml">   \
+            <variables></variables>                       \
+              <block type="procedures_declaration" id="DIGyU?WYqAi1uD0Y0!Kk" x="169" y="55">  \
+              <mutation proccode="function %s" argumentids="[&quot;isf~[,olVKF`dv_U9_OH&quot;]" argumentnames="[&quot;number or text&quot;]" argumentdefaults="[&quot;todo&quot;]" warp="false"></mutation> \
+              <value name="isf~[,olVKF`dv_U9_OH"> \
+                  <shadow type="argument_editor_string_number" id="-S,+Q+:PgCD.d9yRFY!S"> \
+                  <field name="TEXT">number or text</field> \
+                  </shadow> \
+              </value>  \
+              </block>  \
+            </xml>';
+
+  var xml = Blockly.Xml.textToDom(text);
+  var newBlockId  = Blockly.Xml.domToWorkspace(xml, workspace);
+
+
+  return newBlockId;
+
+};
+
+
+
 // how to create a program
 Blockly.RefactoringUtils.createSimpleProgram = function(workspace) {
 	var text = `<xml xmlns="http://www.w3.org/1999/xhtml">
@@ -335,6 +360,7 @@ Blockly.RefactoringUtils.createExtractedBlocksFromXML = function(rootBlock_xml, 
   if (!svgRootNew) {
     throw new Error('newBlock is not rendered.');
   }
+  return newBlock;
 };
 
 
@@ -351,37 +377,66 @@ Blockly.RefactoringUtils.existsIn = function( block_id, marked ) {
   return false; // no match found
 };
 
-
-Blockly.RefactoringUtils.deleteUnmarkedChildBlocks = function( rootBlock_xml, marked ) {
+Blockly.RefactoringUtils.deleteUnmarkedChildBlocks = function( startBlock_copy_xml, endBlock, depth_allowed ) {
   console.log("recur");
-  for (var i = 0, child; child = rootBlock_xml.childNodes[i]; i++) {
+  var final_response  = undefined;
+  // to prevent infinite recursion, acceptable depth is only allowed as per Blockly's env
+  if(depth_allowed == 0)
+    return false;
+
+  for (var i = 0, child; child = startBlock_copy_xml.childNodes[i]; i++) {
     if (child.nodeName.toLowerCase() == 'next') {
-      if (Blockly.RefactoringUtils.existsIn(child.firstChild.id, marked) === false) {
-        rootBlock_xml.removeChild(child);
+      var child_block_node = child.firstChild; //next block will only have one child, next block
+      //if the end marked block is found, delete the child from its copy in startBlock_copy_xml and return
+      if (child_block_node.id == endBlock.id) {
+        Blockly.Xml.deleteNext(child_block_node);
+        return true;
       }
+    }
+  }
+  //recursion to child nodes of startBlock_copy_xml, reducing depth by 1 for each of them
+  for (var i = 0, child; child = startBlock_copy_xml.childNodes[i]; i++) {
+    if (child.nodeName.toLowerCase() == 'next') {
+      var child_block_node = child.firstChild; //next block will only have one child, next block
+      var response = Blockly.RefactoringUtils.deleteUnmarkedChildBlocks( child_block_node, endBlock, depth_allowed - 1);
+      final_response = response;  //single only one next child will be there
       break;
     }
   }
-  for (var i = 0, child; child = rootBlock_xml.childNodes[i]; i++) {
-    Blockly.RefactoringUtils.deleteUnmarkedChildBlocks( child, marked);
-  }
-
+  return final_response;
 };
 
 Blockly.RefactoringUtils.extractMarkedBlocks = function(expBlock) {
+  var RECURSION_DEPTH = 20;  //maximum depth to find marked end block
   var oldBlock = expBlock;
   var ws = oldBlock.workspace;
 
   if(ws.marks == undefined){
     throw new Error('No block marked for extraction');
   }
-  let rootBlock = ws.marks[0]; //first marked block to be used as root
-
+  var startBlock = ws.marks[0]; //first marked block to be used as root
+  var endBlock = ws.marks[1];
   //converted to xml for copying
-  var rootBlock_copy_xml = Blockly.Xml.blockToDom(rootBlock, false);
-  Blockly.RefactoringUtils.deleteUnmarkedChildBlocks( rootBlock_copy_xml, ws.marks );
-  Blockly.RefactoringUtils.createExtractedBlocksFromXML(rootBlock_copy_xml, ws);
+  var startBlock_copy_xml = Blockly.Xml.blockToDom(startBlock, false);
+  var response = Blockly.RefactoringUtils.deleteUnmarkedChildBlocks( startBlock_copy_xml, endBlock, RECURSION_DEPTH);
+  if ( response === true ){
+    var extractedBlock = Blockly.RefactoringUtils.createExtractedBlocksFromXML(startBlock_copy_xml, ws);
 
+    // custom function block which will be created
+    var function_BlockId = Blockly.RefactoringUtils.createCustomFunctionBlock(ws);
+    var function_block = workspace.getBlockById(function_BlockId);
+
+    if(function_block != null){
+      // connect extracted block to custom block created earlier
+      function_block.nextConnection.connect(extractedBlock.previousConnection);
+    }
+    else{
+      console.error("Function BlockId not found");
+    }
+  }
+  else{
+    console.log("Error occurred. No blocks extracted. Maybe recursion threshold reached or wrong order of marking");
+  }
   //reset marked blocks to empty
   ws.marks = undefined;
 };

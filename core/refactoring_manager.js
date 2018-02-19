@@ -140,16 +140,21 @@ Blockly.RefactoringManager.markBlockForExtraction = function(block) {
       if (!svgRootOld) {
         throw new Error('expBlock is not rendered.');
       }
-      //create a new array for marked blocks
+      // create a new array for marked blocks
       if( ws.marks == undefined ) {
         ws.marks = [];
       }
-      // don't add duplicates of a block in marked
-      if (Blockly.RefactoringUtils.existsIn(block.id, ws.marks) === false) {
-        ws.marks.push(expBlock);
+      // reset
+      if(ws.marks.length == 2){
+        ws.marks = undefined;
       }
-      console.log(`Block ${expBlock.id} added to marked`);
-
+      if (ws.marks !== undefined){
+        // don't add duplicates of a block in marked
+        if (Blockly.RefactoringUtils.existsIn(block.id, ws.marks) === false) {
+          ws.marks.push(expBlock);
+        }
+        console.log(`Block ${expBlock.id} added to marked`);
+      }
     }, 0);
   }
 };
