@@ -5,8 +5,6 @@ goog.require('Blockly.utils');
 goog.require('Blockly.Xml');
 goog.require('Blockly.Events');
 goog.require('Blockly.Connection');
-goog.require('Blockly.Workspace');
-// goog.require('Blockly.RemoteMsg');
 
 Blockly.RefactoringUtils.test = function(){
 	console.log("RefactoringUtils");
