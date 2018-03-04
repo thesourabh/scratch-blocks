@@ -31,23 +31,22 @@ const testResp = {
   ]
 };
 
-
+  // current structure : resp = {"type": refactoring, "body": {"type": "trasformation", "body": [{action1}, {action2}]}}
+  // perhaps change to resp = {"type": "", "content": {"type": "", "trans": {}}}
 Blockly.BlockTransformer.prototype.doTransform = function(resp){
     resp = resp || testResp;
-    console.log('Perform transformation');
-    console.log(resp);
-
-    // current structure : resp = {"type": refactoring, "body": {"type": "trasformation", "body": [{action1}, {action2}]}}
-    // perhaps change to resp = {"type": "", "content": {"type": "", "trans": {}}}
     const actions = JSON.parse(resp["body"])["body"];
-	this.varDeclareAction(actions[0]);
-	this.blockCreateAction(actions[1]);
-	this.insertBlockAction(actions[2]);
-  this.blockCreateAction(actions[3]);
-  this.replaceAction(actions[4]);
+    for (var action of actions){
+      this.apply(action);
+    }
 };
 
-Blockly.BlockTransformer.prototype.varDeclareAction = function(action){
+Blockly.BlockTransformer.prototype.apply = function(action){
+  const actionType = action.type;
+  this[actionType](action);
+};
+
+Blockly.BlockTransformer.prototype.VarDeclareAction = function(action){
 	let varCreateJson = {
 		type : "var_create",
 		varType : "",
@@ -62,13 +61,13 @@ Blockly.BlockTransformer.prototype.varDeclareAction = function(action){
 };
 
 // put in a temporary place in the workspace (0,0)?
-Blockly.BlockTransformer.prototype.blockCreateAction = function(action){
+Blockly.BlockTransformer.prototype.BlockCreateAction = function(action){
 	let dom = Blockly.Xml.textToDom(action.blockXML).firstChild;
 	let block = Blockly.Xml.domToBlock(dom, this.workspace);
 };
 
 
-Blockly.BlockTransformer.prototype.insertBlockAction = function(action){
+Blockly.BlockTransformer.prototype.InsertBlockAction = function(action){
 	let targetBlock = this.workspace.getBlockById(action.targetBlock);
 	let insertedBlock = this.workspace.getBlockById(action.insertedBlock);
 	targetBlock.previousConnection.connect(insertedBlock.nextConnection);
@@ -77,7 +76,7 @@ Blockly.BlockTransformer.prototype.insertBlockAction = function(action){
 };
 
 
-Blockly.BlockTransformer.prototype.replaceAction = function(action){
+Blockly.BlockTransformer.prototype.ReplaceAction = function(action){
   var targetBlock = this.workspace.getBlockById(action.targetBlock);
   var replaceWith = this.workspace.getBlockById(action.replaceWith);
 
