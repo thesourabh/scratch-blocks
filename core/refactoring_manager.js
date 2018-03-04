@@ -1,8 +1,33 @@
 // refactoring_manager.js
 goog.provide('Blockly.RefactoringManager');
 goog.require('Blockly.RefactoringUtils');
+goog.require('TestRemoteMsg');
 
-Blockly.RefactoringManager = function() {};
+// isTest is set to true when the instance of refactoring manager is 
+// instantiated 
+Blockly.RefactoringManager = function(workspace, isTest) {
+    this.isTest = isTest;
+    this.workspace = workspace;
+    // only if vm is not present (for testing locally in scratch-blocks)
+    if(isTest){
+        this.remoteMsg_ = new TestRemoteMsg(workspace);
+        this.workspace.addChangeListener(this.blockListener.bind(this));
+    }
+};
+
+Blockly.RefactoringManager.prototype.blockListener = function(e) {
+    if (['extract_var'].indexOf(e.type) !== -1) {
+        console.log(e);
+
+        let targets = {};
+        var xml = Blockly.Xml.workspaceToDom(this.workspace);
+        var xmlString = Blockly.Xml.domToPrettyText(xml);
+        targets['_stage_'] = xmlString; 
+        e['targets'] =  targets;
+        this.remoteMsg_.sendEvent(e);
+    }
+};
+
 Blockly.RefactoringManager.extractVarCallback = function(block) {
     var expBlock = block;
     //check if not expression don't show menu
