@@ -68,11 +68,23 @@ Blockly.BlockTransformer.prototype.BlockCreateAction = function(action){
 
 
 Blockly.BlockTransformer.prototype.InsertBlockAction = function(action){
+  console.log("insert");
 	let targetBlock = this.workspace.getBlockById(action.targetBlock);
-	let insertedBlock = this.workspace.getBlockById(action.insertedBlock);
-	targetBlock.previousConnection.connect(insertedBlock.nextConnection);
+  let insertedBlock = this.workspace.getBlockById(action.insertedBlock);
+  
+  //handle the case when there's a block connected to the block target
+  let previousBlock = targetBlock.previousConnection.targetBlock();
+  if(previousBlock){
+    previousBlock.nextConnection.connect(insertedBlock.previousConnection);
+  }else{
+    // place inserted block close to the postion of the target block to avoid block jump
+    let xy = targetBlock.getRelativeToSurfaceXY();
+    insertedBlock.moveBy(xy.x, xy.y);
+  }
 
-	//handle the case when there's a block connected to the block target
+
+	targetBlock.previousConnection.connect(insertedBlock.nextConnection);
+	
 };
 
 
