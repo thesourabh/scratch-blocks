@@ -144,27 +144,36 @@ Blockly.RefactoringUtils.createTestExpBlock = function() {
 	return Blockly.Xml.domToBlock(dom, workspace);
 };
 
-Blockly.RefactoringUtils.createTestProgram = function(workspace) {
+Blockly.RefactoringUtils.createTestExtractVarProgram = function(workspace) {
 	var text = `<xml xmlns="http://www.w3.org/1999/xhtml">
   <variables></variables>
-  <block type="motion_movesteps" id="motion_block" x="67" y="140">
-    <value name="STEPS">
-      <shadow type="math_number" id="num_shadow1">
-        <field name="NUM">10</field>
+  <block type="motion_turnright" id="commandblock1" x="89" y="84">
+    <value name="DEGREES">
+      <shadow type="math_number" id="num_shadow0">
+        <field name="NUM">15</field>
       </shadow>
-      <block type="operator_add" id="operator_exp_block">
-        <value name="NUM1">
-          <shadow type="math_number" id="num_shadow2">
-            <field name="NUM">3</field>
+    </value>
+    <next>
+      <block type="motion_movesteps" id="commandblock2">
+        <value name="STEPS">
+          <shadow type="math_number" id="num_shadow1">
+            <field name="NUM">10</field>
           </shadow>
-        </value>
-        <value name="NUM2">
-          <shadow type="math_number" id="num_shadow3">
-            <field name="NUM">4</field>
-          </shadow>
+          <block type="operator_add" id="exp_block0">
+            <value name="NUM1">
+              <shadow type="math_number" id="num_shadow2">
+                <field name="NUM">3</field>
+              </shadow>
+            </value>
+            <value name="NUM2">
+              <shadow type="math_number" id="num_shadow3">
+                <field name="NUM">4</field>
+              </shadow>
+            </value>
+          </block>
         </value>
       </block>
-    </value>
+    </next>
   </block>
 </xml>`;
 
