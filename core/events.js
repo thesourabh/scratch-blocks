@@ -139,6 +139,12 @@ Blockly.Events.VAR_RENAME = 'var_rename';
 Blockly.Events.UI = 'ui';
 
 /**
+ * Name of event that invoke extract var
+ * @const
+ */
+Blockly.Events.EXTRACT_VAR = 'extract_var'; 
+
+/**
  * List of events queued for firing.
  * @private
  */
@@ -1222,6 +1228,26 @@ Blockly.Events.VarRename.prototype.run = function(forward) {
     workspace.renameVariableById(this.varId, this.oldName);
   }
 };
+
+/**
+ * Class for a variable extraction event.
+ *
+ */
+Blockly.Events.ExtractVar = function(block) { 
+  //if block is not expression type return 
+ Blockly.Events.ExtractVar.superClass_.constructor.call(this, block); 
+}; 
+ 
+goog.inherits(Blockly.Events.ExtractVar, Blockly.Events.Abstract); 
+ 
+Blockly.Events.ExtractVar.prototype.type = Blockly.Events.EXTRACT_VAR; 
+ 
+
+Blockly.Events.ExtractVar.prototype.toJson = function() { 
+  var json = Blockly.Events.ExtractVar.superClass_.toJson.call(this); 
+  json['workspaceId'] = this.workspaceId; 
+  return json;
+}; 
 
 /**
  * Enable/disable a block depending on whether it is properly connected.
