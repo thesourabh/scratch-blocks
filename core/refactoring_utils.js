@@ -231,6 +231,33 @@ Blockly.RefactoringUtils.createTestProgramForExtractVar = function(workspace) {
 	Blockly.Xml.domToWorkspace(xml, workspace);
 };
 
+Blockly.RefactoringUtils.createExtractCustomBlockTestProgram = function(workspace) {
+		var text = `<xml xmlns="http://www.w3.org/1999/xhtml">
+  <variables>
+    <variable type="" id="K~LCa}G%F.MR*BM77j?s-my variable">my variable</variable>
+  </variables>
+  <block type="procedures_definition" id="procedures_definition_id" x="30" y="30">
+    <statement name="custom_block">
+      <shadow type="procedures_prototype" id="shadow_procedures_prototype_id">
+        <mutation proccode="testblock" argumentids="[]" argumentnames="[]" argumentdefaults="[]" warp="false"></mutation>
+      </shadow>
+    </statement>
+    <next>
+      <block type="motion_movesteps" id="o6~2_w#kM]?p*wk$7s_/">
+        <value name="STEPS">
+          <shadow type="math_number" id="p2]SMm68fcM[(^^X.R1!">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+    </next>
+  </block>
+</xml>`;
+
+	var xml = Blockly.Xml.textToDom(text);
+	Blockly.Xml.domToWorkspace(xml, workspace);
+};
+
 
 Blockly.RefactoringUtils.testRefactoring = function(workspace) {
 	console.log(workspace);

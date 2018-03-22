@@ -90,6 +90,9 @@ Blockly.BlockTransformer.prototype.InsertBlockAction = function(action){
 
 Blockly.BlockTransformer.prototype.ReplaceAction = function(action){
   var targetBlock = this.workspace.getBlockById(action.targetBlock);
+  // if(!targetBlock){
+  // 	return;
+  // }
   var replaceWith = this.workspace.getBlockById(action.replaceWith);
 
   var parentConnection = targetBlock.outputConnection.targetConnection;
