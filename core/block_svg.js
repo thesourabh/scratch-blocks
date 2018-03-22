@@ -764,8 +764,6 @@ Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {
     return;
   }
 
-  menuOptions.push(Blockly.ContextMenu.blockHelpOption(block));
-
   // Allow the block to add or modify menuOptions.
   if (this.customContextMenu) {
     this.customContextMenu(menuOptions);
@@ -1157,6 +1155,22 @@ Blockly.BlockSvg.prototype.addSelect = function() {
 Blockly.BlockSvg.prototype.removeSelect = function() {
   Blockly.utils.removeClass(/** @type {!Element} */ (this.svgGroup_),
                        'blocklySelected');
+};
+
+/**
+ * Update the cursor over this block by adding or removing a class.
+ * @param {boolean} letMouseThrough True if the blocks should ignore pointer
+ *     events, false otherwise.
+ * @package
+ */
+Blockly.BlockSvg.prototype.setMouseThroughStyle = function(letMouseThrough) {
+  if (letMouseThrough) {
+    Blockly.utils.addClass(/** @type {!Element} */ (this.svgGroup_),
+        'blocklyDraggingMouseThrough');
+  } else {
+    Blockly.utils.removeClass(/** @type {!Element} */ (this.svgGroup_),
+        'blocklyDraggingMouseThrough');
+  }
 };
 
 /**
