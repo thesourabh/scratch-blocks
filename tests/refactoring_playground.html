@@ -109,7 +109,6 @@
         // test refactoring
         // Blockly.RefactoringUtils.createTestExtractVarProgram(workspace);
         Blockly.RefactoringUtils.createExtractCustomBlockTestProgram(workspace);
-        
       }
 
       function getToolboxElement() {
@@ -131,6 +130,15 @@
         var xml = Blockly.Xml.textToDom(input.value);
         Blockly.Xml.domToWorkspace(xml, workspace);
         taChange();
+      }
+
+      function applyActions() {
+         var input = document.getElementById('transformation_steps');
+         var body = {"type": "trasformation", "body": JSON.parse(input.value)};
+         var resp = {"type": "trasformation", "body": JSON.stringify(body)};
+        // resp = {"type": refactoring, "body": {"type": "trasformation", "body": [{action1}, {action2}]}}
+        console.log(resp);
+        workspace.blockTransformer.doTransform(resp);
       }
 
       function toCode(lang) {
@@ -229,6 +237,13 @@
             Math.round(Math.random() * 600 + 40)
           );
         }
+      }
+
+      function invokeExtractProcedure(){
+        console.log("extract custom blocks");
+        workspace.marks = ["!H+z6Z7cJa[uFGSbrO%#", "p:TW!_71}Xmz3a/n_QcQ"];
+        
+
       }
 
       var equalsXml = [
@@ -501,14 +516,24 @@
     <hr>
 
     <p>
+      <input type="button" value="Transform" onclick="applyActions()">
+      &nbsp;
+      <br>
+      <textarea id="transformation_steps" style="width: 26%; height: 12em"></textarea>
+    </p>
+
+    <hr>
+
+    <p>
       Log events: &nbsp;
       <input type="checkbox" onclick="logEvents(this.checked)" id="logCheck">
     </p>
 
     <p>
       Test: &nbsp;
-      <input type="button" value="Extract Var" onclick="sprinkles(100)">
+      <input type="button" value="Extract Procedure" onclick="invokeExtractProcedure()">
     </p>
+
 
 
     <p>

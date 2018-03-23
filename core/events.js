@@ -145,6 +145,12 @@ Blockly.Events.UI = 'ui';
 Blockly.Events.EXTRACT_VAR = 'extract_var'; 
 
 /**
+ * Name of event that invoke extract var
+ * @const
+ */
+Blockly.Events.EXTRACT_PROCEDURE = 'extract_procedure'; 
+
+/**
  * List of events queued for firing.
  * @private
  */
@@ -1246,6 +1252,28 @@ Blockly.Events.ExtractVar.prototype.type = Blockly.Events.EXTRACT_VAR;
 Blockly.Events.ExtractVar.prototype.toJson = function() { 
   var json = Blockly.Events.ExtractVar.superClass_.toJson.call(this); 
   json['workspaceId'] = this.workspaceId; 
+  return json;
+};
+
+
+/**
+ * Class for a custom procedure extraction event.
+ *
+ */
+Blockly.Events.ExtractProcedure = function(workspaceId, targetBlockIDs) {
+ Blockly.Events.ExtractProcedure.superClass_.constructor.call(this, null);
+ this.targetBlockIDs = targetBlockIDs;
+ this.workspaceId = workspaceId;
+}; 
+ 
+goog.inherits(Blockly.Events.ExtractProcedure, Blockly.Events.Abstract); 
+ 
+Blockly.Events.ExtractProcedure.prototype.type = Blockly.Events.EXTRACT_PROCEDURE; 
+ 
+
+Blockly.Events.ExtractProcedure.prototype.toJson = function() { 
+  var json = Blockly.Events.ExtractProcedure.superClass_.toJson.call(this); 
+  json['workspaceId'] = this.workspaceId;
   return json;
 }; 
 

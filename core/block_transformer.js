@@ -90,16 +90,60 @@ Blockly.BlockTransformer.prototype.InsertBlockAction = function(action){
 
 Blockly.BlockTransformer.prototype.ReplaceAction = function(action){
   var targetBlock = this.workspace.getBlockById(action.targetBlock);
+  var targetBlockList = action.targetBlockList;
+  var replaceWith = this.workspace.getBlockById(action.replaceWith);
   // if(!targetBlock){
   // 	return;
   // }
-  var replaceWith = this.workspace.getBlockById(action.replaceWith);
+  if(targetBlock){
+    var parentConnection = targetBlock.outputConnection.targetConnection;
+    targetBlock.unplug(true,true);
+    parentConnection.connect(replaceWith.outputConnection);
+    // delete old value
+    targetBlock.dispose();
+  }
 
-  var parentConnection = targetBlock.outputConnection.targetConnection;
-  targetBlock.unplug(true,true);
+  //todo handle when targetBlockList has one block to replace (e.g. if block)
+  if(targetBlockList){
+    var targetBlocks = [];
+    for( var blockID of targetBlockList){
+      targetBlocks.push(this.workspace.getBlockById(blockID));
+    }
 
-  parentConnection.connect(replaceWith.outputConnection);
+    //get previous conn of top most block
+    var topmostBlock = targetBlocks[0];
 
-  // delete old value
-  targetBlock.dispose();
+    let targetBlock = topmostBlock;
+    let insertedBlock = replaceWith;
+    
+    //handle the case when there's a block connected to the block target
+    // let previousBlock = targetBlock.previousConnection.targetBlock();
+    let prevConn = targetBlock.previousConnection.targetConnection;
+    if(prevConn){
+      prevConn.connect(insertedBlock.previousConnection);
+    }else{
+      // place inserted block close to the postion of the target block to avoid block jump
+      let xy = targetBlock.getRelativeToSurfaceXY();
+      insertedBlock.moveBy(xy.x, xy.y);
+    }
+
+    // unplug bottom block
+    let lastBlock = targetBlocks[targetBlocks.length-1];
+    
+    // the block after the replaced fragment
+    let nextBlock = lastBlock.nextConnection.targetBlock();
+    if(nextBlock){
+      let nextConn = lastBlock.nextConnection.targetBlock().previousConnection;
+      lastBlock.unplug(); //must be unplugged before nextConn can connect to the inserted block
+      insertedBlock.nextConnection.connect(nextConn);
+    }
+
+    // dispose the fragment
+    while(targetBlocks.length>0){
+      var toDispose = targetBlocks.pop();
+      toDispose.dispose();
+    }
+
+  }
+
 };

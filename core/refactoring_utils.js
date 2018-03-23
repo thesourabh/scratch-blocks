@@ -232,30 +232,15 @@ Blockly.RefactoringUtils.createTestProgramForExtractVar = function(workspace) {
 };
 
 Blockly.RefactoringUtils.createExtractCustomBlockTestProgram = function(workspace) {
-		var text = `<xml xmlns="http://www.w3.org/1999/xhtml">
-  <variables>
-    <variable type="" id="K~LCa}G%F.MR*BM77j?s-my variable">my variable</variable>
-  </variables>
-  <block type="procedures_definition" id="procedures_definition_id" x="30" y="30">
-    <statement name="custom_block">
-      <shadow type="procedures_prototype" id="shadow_procedures_prototype_id">
-        <mutation proccode="testblock" argumentids="[]" argumentnames="[]" argumentdefaults="[]" warp="false"></mutation>
-      </shadow>
-    </statement>
-    <next>
-      <block type="motion_movesteps" id="o6~2_w#kM]?p*wk$7s_/">
-        <value name="STEPS">
-          <shadow type="math_number" id="p2]SMm68fcM[(^^X.R1!">
-            <field name="NUM">10</field>
-          </shadow>
-        </value>
-      </block>
-    </next>
-  </block>
-</xml>`;
+		var text = `<xml xmlns="http://www.w3.org/1999/xhtml"><variables><variable type="" id="K~LCa}G%F.MR*BM77j?s-my variable">my variable</variable></variables><block type="motion_movesteps" id="!H+z6Z7cJa[uFGSbrO%#" x="269" y="129"><value name="STEPS"><shadow type="math_number" id="^CSpm#-v^3)M/L|PWK,f"><field name="NUM">10</field></shadow><block type="operator_add" id="B=3pl*d@H~)g{%JJ^V!"><value name="NUM1"><shadow type="math_number" id="b0002"><field name="NUM">1</field></shadow></value><value name="NUM2"><shadow type="math_number" id="tH/lwmVS{_8@(LeyEeG8"><field name="NUM">2</field></shadow></value></block></value><next><block type="motion_turnright" id="p:TW!_71}Xmz3a/n_QcQ"><value name="DEGREES"><shadow type="math_number" id="mU]f2CyOUJZ*=c6mK2$V"><field name="NUM">-15</field></shadow></value><next><block type="motion_movesteps" id="wcq8c7K==a(u~P-RY^X"><value name="STEPS"><shadow type="math_number" id="O_C!LNBM,Ul9q5a?lhU"><field name="NUM">10</field></shadow></value><next><block type="motion_turnright" id="$[b6FB?17hAPhdsR%s["><value name="DEGREES"><shadow type="math_number" id="GEQD=kSVMbHF}J-CIU6W"><field name="NUM">20</field></shadow></value><next><block type="motion_pointindirection" id="uOz.25fL5PTs|+iL;Rx/"><value name="DIRECTION"><shadow type="math_angle" id="]p@TO^pkIP5bvHu]MY)3"><field name="NUM">90</field></shadow></value></block></next></block></next></block></next></block></next></block><block type="control_repeat" id="gmv]ISX{J_XQF@7+f-h" x="567" y="176"><value name="TIMES"><shadow type="math_whole_number" id="I,}aH[Mzm1-HNt]1eA^v"><field name="NUM">10</field></shadow></value><statement name="SUBSTACK"><block type="motion_movesteps" id="h7Om}E$?nj:JCN-Fz#:,"><value name="STEPS"><shadow type="math_number" id="+)]e=ap)t@-KBa|?R+wQ"><field name="NUM">10</field></shadow></value><next><block type="motion_turnright" id="(X28fQD.]qnmS}/UOhuV"><value name="DEGREES"><shadow type="math_number" id="%)M_xYA[/)eG#TXZW#["><field name="NUM">15</field></shadow></value></block></next></block></statement></block></xml>`;
 
 	var xml = Blockly.Xml.textToDom(text);
 	Blockly.Xml.domToWorkspace(xml, workspace);
+
+	//mark blocks to be extracted
+ 	workspace.marks = [];
+    workspace.marks.push(workspace.getBlockById("!H+z6Z7cJa[uFGSbrO%#"))
+    workspace.marks.push(workspace.getBlockById("p:TW!_71}Xmz3a/n_QcQ"))
 };
 
 

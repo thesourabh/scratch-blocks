@@ -28,9 +28,13 @@ TestRemoteMsg.prototype.receiveMessage = function(serverMsg) {
 
 TestRemoteMsg.prototype.sendEvent = function(event) {
 	let message = {};
-    message['type'] = "invocation";
-    let request = {"refactoring": event['type'], "targetBlockExpId": event['blockId']};
+    let request = {"refactoring": event['type'], 
+    				"targetBlockExpId": event['blockId'],
+    				"targetBlockIDs": event['targetBlockIDs']
+    			};
 	let body = {"request":request, "targets":event["targets"]};
+   
+    message['type'] = "invocation";
     message['body'] = JSON.stringify(body);
 
     console.log(JSON.stringify(message));
