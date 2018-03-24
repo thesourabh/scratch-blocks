@@ -1,16 +1,15 @@
 // refactoring_manager.js
 goog.provide('Blockly.RefactoringManager');
 goog.require('Blockly.RefactoringUtils');
-goog.require('TestRemoteMsg');
 
 // isTest is set to true when the instance of refactoring manager is 
 // instantiated 
-Blockly.RefactoringManager = function(workspace, isTest) {
-    this.isTest = isTest;
+Blockly.RefactoringManager = function(workspace) {
+    
     this.workspace = workspace;
     // only if vm is not present (for testing locally in scratch-blocks)
-    if(isTest){
-        this.remoteMsg_ = new TestRemoteMsg(workspace);
+    if(window.testSocket){
+        this.remoteMsg_ = window.testSocket;// || new TestRemoteMsg(workspace);
         this.workspace.addChangeListener(this.blockListener.bind(this));
     }
 };
@@ -99,11 +98,11 @@ Blockly.RefactoringManager.extractSelectedBlocksCallback = function(block) {
 
 Blockly.RefactoringManager.extractProcedureCallback = function(blocks) {
     var block = blocks[0];
-    var workspaceId = workspace.id;
+
     // todo: array of block ID
     var targetBlockIDs = [];
-    for (var block of blocks){
-      targetBlockIDs.push(block.id);
+    for (var b of blocks){
+      targetBlockIDs.push(b.id);
     }
     //check if not expression don't show menu
     console.log("refactoring with local build works!");
@@ -123,7 +122,7 @@ Blockly.RefactoringManager.extractProcedureCallback = function(blocks) {
             // };
             // console.log(invMsg);
 
-            Blockly.Events.fire(new Blockly.Events.ExtractProcedure(workspaceId, targetBlockIDs));
+            Blockly.Events.fire(new Blockly.Events.ExtractProcedure(ws.id, targetBlockIDs));
         }, 0);
     }
 };

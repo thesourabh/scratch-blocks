@@ -434,27 +434,15 @@ Blockly.ContextMenu.markForExtractionOption = function(block) {
   return markForExtractionOption;
 };
 
-Blockly.ContextMenu.extractBlocksOption = function(block) {
-  var enabled = false;  //disable menu item initially
-  var ws = block.workspace;
-  if( ws.marks !== undefined && ws.marks.length == 2 ) {
-    enabled = true;   //only enable when two blocks have been marked
-  }
-
-  var extractBlocksOption = {
-    text : 'Extract Blocks',
-    enabled : enabled,
-    callback : Blockly.RefactoringManager.extractSelectedBlocksCallback(block)
-  };
-
-  return extractBlocksOption;
-};
 
 
 Blockly.ContextMenu.extractProcedureOption = function(block) {
   var enabled = false;  //disable menu item initially
   var ws = block.workspace;
 
+  if( ws.marks == undefined ){
+    ws.marks = [];
+  }
   if( ws.marks.length == 2 ) {
     enabled = true;   //only enable when two blocks have been marked
   }

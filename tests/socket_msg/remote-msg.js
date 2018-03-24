@@ -1,10 +1,5 @@
-goog.provide("TestRemoteMsg");
 
-goog.require('SockJS');
-goog.require('Stomp');
-
-TestRemoteMsg = function(workspace){
-	this.workspace = workspace;
+TestRemoteMsg = function(){
 	this.socket = new SockJS('http://localhost:8080/service-endpoint');
 	this.stompClient = Stomp.over(this.socket);
 	this.stompClient.debug = null;
@@ -23,7 +18,7 @@ TestRemoteMsg = function(workspace){
 
 TestRemoteMsg.prototype.receiveMessage = function(serverMsg) {
 	const msg = JSON.parse(serverMsg.body);
-	this.workspace.blockTransformer.doTransform(msg);
+	workspace.blockTransformer.doTransform(msg);
 };
 
 TestRemoteMsg.prototype.sendEvent = function(event) {

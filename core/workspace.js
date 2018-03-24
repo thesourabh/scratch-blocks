@@ -106,7 +106,7 @@ Blockly.Workspace = function(opt_options) {
    */
   this.potentialVariableMap_ = null;
 
-  this.refactoringManager = new Blockly.RefactoringManager(this,true);
+  this.refactoringManager = new Blockly.RefactoringManager(this);
   this.blockTransformer = new Blockly.BlockTransformer(this);
 };
 
