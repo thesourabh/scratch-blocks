@@ -5,7 +5,10 @@ goog.require('Blockly.RefactoringUtils');
 // isTest is set to true when the instance of refactoring manager is 
 // instantiated 
 Blockly.RefactoringManager = function(workspace) {
-    
+    this.blockSelection = [];
+    this.startBlockSelection = null;
+    this.endBlockSelection = null;
+
     this.workspace = workspace;
     // only if vm is not present (for testing locally in scratch-blocks)
     if(window.testSocket){
@@ -80,6 +83,48 @@ Blockly.RefactoringManager.markBlockForExtraction = function(block) {
   }
 };
 
+Blockly.RefactoringManager.prototype.getStartBlockSelection = function(){
+  return this.startBlockSelection;
+};
+
+Blockly.RefactoringManager.prototype.getEndBlockSelection = function(){
+  return this.endBlockSelection;
+};
+
+
+Blockly.RefactoringManager.prototype.blockStartSelectionCallBack = function(block) {
+  var selectedBlock = block;
+  
+  var ws = selectedBlock.workspace;
+  var svgRootOld = selectedBlock.getSvgRoot();
+  if (!svgRootOld) {
+    throw new Error('selected block is not rendered.');
+  }
+  
+  this.startBlockSelection = selectedBlock;
+  console.log(`Select block ${selectedBlock.id} as the start block`);
+};
+
+Blockly.RefactoringManager.prototype.blockEndSelectionCallBack = function(block) {
+  var selectedBlock = block;
+    
+  var ws = selectedBlock.workspace;
+  var svgRootOld = selectedBlock.getSvgRoot();
+  if (!svgRootOld) {
+    throw new Error('selected block is not rendered.');
+  }
+  
+  this.endBlockSelection = selectedBlock;
+  console.log(`Select block ${selectedBlock.id} as the end block`);
+};
+
+Blockly.RefactoringManager.prototype.clearBlockSelectionCallBack = function() {
+  this.startBlockSelection = null;
+  this.endBlockSelection = null;
+  console.log(`clear selection`);
+};
+
+
 Blockly.RefactoringManager.extractSelectedBlocksCallback = function(block) {
   var expBlock = block;
   return function(e) {
@@ -96,17 +141,14 @@ Blockly.RefactoringManager.extractSelectedBlocksCallback = function(block) {
 };
 
 
-Blockly.RefactoringManager.extractProcedureCallback = function(blocks) {
-    var block = blocks[0];
-
-    // todo: array of block ID
+Blockly.RefactoringManager.prototype.extractProcedureCallback = function(block) {
     var targetBlockIDs = [];
-    for (var b of blocks){
-      targetBlockIDs.push(b.id);
-    }
+    targetBlockIDs.push(this.startBlockSelection.id);
+    targetBlockIDs.push(this.endBlockSelection.id);
+
     //check if not expression don't show menu
     console.log("refactoring with local build works!");
-    return function(e) {
+    // return function(e) {
         console.log("callback to execute now!");
         setTimeout(function() {
             var ws = block.workspace;
@@ -115,14 +157,7 @@ Blockly.RefactoringManager.extractProcedureCallback = function(blocks) {
                   throw new Error('expBlock is not rendered.');
                 }
 
-            // var invMsg = {
-            //     'ws_id': ws.id,
-            //     'targetBlockIDs': targetBlockIDs,
-            //     'type': 'extract_procedure'
-            // };
-            // console.log(invMsg);
-
             Blockly.Events.fire(new Blockly.Events.ExtractProcedure(ws.id, targetBlockIDs));
         }, 0);
-    }
+    // }
 };

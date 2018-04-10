@@ -1320,6 +1320,9 @@ Blockly.WorkspaceSvg.prototype.showContextMenu_ = function(e) {
         Blockly.ContextMenu.wsCleanupOption(this,topBlocks.length));
   }
 
+  // clear selection
+  menuOptions.push(Blockly.ContextMenu.clearSelectionOption(this));
+
   if (this.options.collapse) {
     var hasCollapsedBlocks = false;
     var hasExpandedBlocks = false;

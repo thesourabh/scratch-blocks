@@ -413,44 +413,73 @@ Blockly.ContextMenu.extractVariableOption = function(block) {
   return extractVariableOption; 
 };
 
-Blockly.ContextMenu.markForExtractionOption = function(block) {
-
-  var ws = block.workspace;
-  if( ws.marks == undefined ) {
-    var text = 'Mark start block for extraction';
+Blockly.ContextMenu.selectStartBlockOption = function(block) {
+  var refactoringManager = block.workspace.refactoringManager;
+  var blockSelection = refactoringManager.blockSelection;
+  var marks = blockSelection;
+  var selectionType = "";
+  if( !refactoringManager.getStartBlockSelection() ) {
+    var text = 'Select start block';
   }
-  else if(ws.marks.length == 1 ){
-    var text = 'Mark end block for extraction';
-  }
-  else{
-    var text = 'Clear mark';
-  }
-  var markForExtractionOption = {
+ 
+  var selectStartBlockOption = {
     text : text,
     enabled : true,
-    callback : Blockly.RefactoringManager.markBlockForExtraction(block)
+    callback : refactoringManager.blockStartSelectionCallBack.bind(refactoringManager,block)
   };
 
-  return markForExtractionOption;
+  return selectStartBlockOption;
 };
 
 
+Blockly.ContextMenu.selectEndBlockOption = function(block) {
+  var refactoringManager = block.workspace.refactoringManager;
+  var blockSelection = refactoringManager.blockSelection;
+  var marks = blockSelection;
+  var selectionType = "";
+  var enabled = false;
+  if( !refactoringManager.getEndBlockSelection() && refactoringManager.getStartBlockSelection() ) {
+    var text = 'Select end block';
+    enabled = true;
+  }
+    var selectStartBlockOption = {
+    text : text,
+    enabled : enabled,
+    callback : refactoringManager.blockEndSelectionCallBack.bind(refactoringManager,block)
+  };
+
+  return selectStartBlockOption;
+};
+
+Blockly.ContextMenu.clearSelectionOption = function(ws) {
+  var refactoringManager = ws.refactoringManager;
+  var enabled = false;
+  if( refactoringManager.getEndBlockSelection() || refactoringManager.getStartBlockSelection() ) {
+    var text = 'Clear block selection';
+    enabled = true;
+  }
+    var clearSelectionOption = {
+    text : text,
+    enabled : enabled,
+    callback : refactoringManager.clearBlockSelectionCallBack.bind(refactoringManager)
+  };
+
+  return clearSelectionOption;
+};
+
 
 Blockly.ContextMenu.extractProcedureOption = function(block) {
+  var refactoringManager = block.workspace.refactoringManager;
   var enabled = false;  //disable menu item initially
-  var ws = block.workspace;
-
-  if( ws.marks == undefined ){
-    ws.marks = [];
-  }
-  if( ws.marks.length == 2 ) {
+  
+  if( refactoringManager.getEndBlockSelection() && refactoringManager.getStartBlockSelection() ) {
     enabled = true;   //only enable when two blocks have been marked
   }
 
   var extractBlocksOption = {
     text : 'Extract Procedure',
     enabled : enabled,
-    callback : Blockly.RefactoringManager.extractProcedureCallback(ws.marks)
+    callback : refactoringManager.extractProcedureCallback.bind(refactoringManager, block)
   };
 
   return extractBlocksOption;

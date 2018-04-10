@@ -768,7 +768,9 @@ Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {
 
   // Add refactoring invocation for extract variable
   menuOptions.push(Blockly.ContextMenu.extractVariableOption(block));
-  menuOptions.push(Blockly.ContextMenu.markForExtractionOption(block));
+  menuOptions.push(Blockly.ContextMenu.selectStartBlockOption(block));
+  menuOptions.push(Blockly.ContextMenu.selectEndBlockOption(block));
+  
   // menuOptions.push(Blockly.ContextMenu.extractBlocksOption(block));
   menuOptions.push(Blockly.ContextMenu.extractProcedureOption(block));
 
