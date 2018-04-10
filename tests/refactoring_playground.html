@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
     <title>Refactoring Playground</title>
-    <script src="./socket_msg/stomp.min.js"></script>
-    <script src="./socket_msg/sockjs.min.js"></script>
+    <script src="./socket_msg/stomp.js"></script>
+    <script src="./socket_msg/sockjs.js"></script>
     <script src="./socket_msg/remote-msg.js"></script>
 
     <script src="../blockly_uncompressed_vertical.js"></script>
@@ -110,7 +110,8 @@
         }
 
         // test refactoring     
-        Blockly.RefactoringUtils.createExtractCustomBlockTestProgram(workspace);
+        // Blockly.RefactoringUtils.createExtractCustomBlockTestProgram(workspace);
+        Blockly.RefactoringUtils.createTestSocketSizeLimit(workspace);
       }
 
       function getToolboxElement() {
@@ -243,9 +244,6 @@
 
       function invokeExtractProcedure(){
         console.log("extract custom blocks");
-        workspace.marks = ["!H+z6Z7cJa[uFGSbrO%#", "p:TW!_71}Xmz3a/n_QcQ"];
-        
-
       }
 
       var equalsXml = [
@@ -480,6 +478,19 @@
           </shadow>
         </value>
       </block>
+    </xml>
+
+    <xml id="toolbox-extended" style="display: none">
+      <block type="pen.clear"/>
+      <block type="pen.stamp"/>
+      <block type="pen.penDown"/>
+      <block type="pen.penUp"/>
+      <block type="pen.setPenColorToColor"><value name="COLOR"><shadow type="colour_picker"/></value></block>
+      <block type="pen.changePenColorParamBy"><value name="COLOR_PARAM"><shadow type="pen.menu.colorParam"><field name="colorParam">color</field></shadow></value><value name="VALUE"><shadow type="math_number"><field name="NUM">10</field></shadow></value></block>
+      <block type="pen.setPenColorParamTo"><value name="COLOR_PARAM"><shadow type="pen.menu.colorParam"><field name="colorParam">color</field></shadow></value><value name="VALUE"><shadow type="math_number"><field name="NUM">50</field></shadow></value></block>
+      <block type="pen.changePenSizeBy"><value name="SIZE"><shadow type="math_number"><field name="NUM">1</field></shadow></value></block>
+      <block type="pen.setPenSizeTo"><value name="SIZE"><shadow type="math_number"><field name="NUM">1</field></shadow></value></block>
+     
     </xml>
 
     <!-- Sidebar -->
