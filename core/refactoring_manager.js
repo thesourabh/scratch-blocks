@@ -23,7 +23,7 @@ Blockly.RefactoringManager.prototype.blockListener = function(e) {
 
         let targets = {};
         var xml = Blockly.Xml.workspaceToDom(this.workspace);
-        var xmlString = Blockly.Xml.domToPrettyText(xml);
+        var xmlString = "<xml>"+xml.innerHTML+"</xml>";
         targets['_stage_'] = xmlString; 
         e['targets'] =  targets;
         this.remoteMsg_.sendEvent(e);
