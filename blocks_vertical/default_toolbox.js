@@ -642,6 +642,14 @@ Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: no
   '<category name="Extensions" colour="#FF6680" secondaryColour="#FF4D6A" '+
     'iconURI="../media/extensions/wedo2-block-icon.svg">'+
     '<block type="extension_pen_down" id="extension_pen_down"></block>'+
+    '<block type="pen.clear"></block>'+
+    '<block type="pen.stamp"></block>+'+
+    '<block type="pen.penDown"></block>'+
+    '<block type="pen.penUp"></block>'+
+    '<block type="pen.setPenSizeTo"><value name="SIZE"><shadow type="math_number"><field name="NUM">1</field></shadow></value></block>'+
+    '<block type="pen.setPenColorToColor"><value name="COLOR"><shadow type="colour_picker"></shadow></value></block>'+
+    '<block type="pen.changePenShadeBy"><value name="SHADE"><shadow type="math_number"><field name="NUM">1</field></shadow></value></block>'+
+    '<block type="pen.setPenShadeToNumber"><value name="SHADE"><shadow type="math_number"><field name="NUM">0</field></shadow></value></block>'+
     '<block type="extension_music_drum" id="extension_music_drum">'+
       '<value name="NUMBER">'+
         '<shadow type="math_number">'+

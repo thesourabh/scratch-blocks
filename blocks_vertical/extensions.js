@@ -51,6 +51,219 @@ Blockly.Blocks['extension_pen_down'] = {
   }
 };
 
+Blockly.Blocks['pen.penDown'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1 %2pen down",
+      "args0": [
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "type": "field_vertical_separator"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement", "scratch_extension"]
+    });
+  }
+};
+
+Blockly.Blocks['pen.penUp'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1 %2pen up",
+      "args0": [
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "type": "field_vertical_separator"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement", "scratch_extension"]
+    });
+  }
+};
+
+// clear
+Blockly.Blocks['pen.clear'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1 %2clear",
+      "args0": [
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "type": "field_vertical_separator"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement", "scratch_extension"]
+    });
+  }
+};
+
+// stamp
+Blockly.Blocks['pen.stamp'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1 %2stamp",
+      "args0": [
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "type": "field_vertical_separator"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement", "scratch_extension"]
+    });
+  }
+};
+
+Blockly.Blocks['pen.changePenShadeBy'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1 %2change pen shade by %3",
+      "args0": [
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "type": "field_vertical_separator"
+        },
+        {
+          "type": "input_value", 
+          "name": "SHADE"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement", "scratch_extension"]
+    });
+  }
+};
+
+// pen.setPenShadeToNumber
+Blockly.Blocks['pen.setPenShadeToNumber'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1 %2set pen shade to %3",
+      "args0": [
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "type": "field_vertical_separator"
+        },
+        {
+          "type": "input_value", 
+          "name": "SHADE"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement", "scratch_extension"]
+    });
+  }
+};
+
+// set pen size to
+Blockly.Blocks['pen.setPenSizeTo'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1 %2set pen size to %3",
+      "args0": [
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "type": "field_vertical_separator"
+        },
+        {
+          "type": "input_value", 
+          "name": "SIZE"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement", "scratch_extension"]
+    });
+  }
+};
+
+// set pen color to
+Blockly.Blocks['pen.setPenColorToColor'] = {
+  /**
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": "%1 %2set pen color to %3",
+      "args0": [
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "extensions/pen-block-icon.svg",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "type": "field_vertical_separator"
+        },
+        {
+          "type": "input_value", 
+          "name": "COLOR"
+        }
+      ],
+      "category": Blockly.Categories.more,
+      "extensions": ["colours_more", "shape_statement", "scratch_extension"]
+    });
+  }
+};
+
 Blockly.Blocks['extension_music_drum'] = {
   /**
    * @this Blockly.Block
@@ -233,3 +446,4 @@ Blockly.Blocks['extension_music_reporter'] = {
     });
   }
 };
+
