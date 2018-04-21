@@ -5,7 +5,10 @@ TestRemoteMsg = function(){
 	// window._socket = this.socket;
 
 	// ws:// url need /websocket after endpoint if the server uses sockjs
-	this.stompClient = Stomp.client('ws://localhost:8080/service-endpoint');		
+	// this.stompClient = Stomp.client('ws://localhost:8080/service-endpoint'); //http://128.173.237.93:8888/
+	const base_deployment_server_url = '128.173.237.93:8888';
+	const base_local_server_url = 'localhost:8888';
+	this.stompClient = Stomp.client('ws://'+base_local_server_url+'/service-endpoint'); 		
 	// this.stompClient = Stomp.client('ws://engine-env.ytkwr5npba.us-east-1.elasticbeanstalk.com:8080/service-endpoint/websocket');
 	// this.stompClient.debug = null;
 
