@@ -8,7 +8,7 @@ TestRemoteMsg = function(){
 	// this.stompClient = Stomp.client('ws://localhost:8080/service-endpoint'); //http://128.173.237.93:8888/
 	const base_deployment_server_url = '128.173.237.93:8888';
 	const base_local_server_url = 'localhost:8888';
-	this.stompClient = Stomp.client('ws://'+base_local_server_url+'/service-endpoint'); 		
+	this.stompClient = Stomp.client('ws://'+base_deployment_server_url+'/service-endpoint'); 		
 	// this.stompClient = Stomp.client('ws://engine-env.ytkwr5npba.us-east-1.elasticbeanstalk.com:8080/service-endpoint/websocket');
 	// this.stompClient.debug = null;
 
@@ -33,8 +33,13 @@ TestRemoteMsg.prototype.errorCallBack = function(error) {
 };
 
 TestRemoteMsg.prototype.receiveMessage = function(serverMsg) {
+	console.timeEnd("roundtrip");
 	const msg = JSON.parse(serverMsg.body);
+	console.log("server time: "+parseInt(msg.metadata));
+	
+	console.time("transformblocks");
 	workspace.blockTransformer.doTransform(msg);
+	console.timeEnd("transformblocks");
 };
 
 TestRemoteMsg.prototype.sendEvent = function(event) {
@@ -49,5 +54,6 @@ TestRemoteMsg.prototype.sendEvent = function(event) {
     message['body'] = JSON.stringify(body);
 
     console.log(JSON.stringify(message));
+    console.time("roundtrip");
 	this.stompClient.send("/app/request", {}, JSON.stringify(message));
 };

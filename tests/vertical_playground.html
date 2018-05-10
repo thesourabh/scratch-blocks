@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
     <title>Vertical Playground</title>
+    <script src="./socket_msg/stomp.js"></script>
+    <script src="./socket_msg/sockjs.js"></script>
+    <script src="./socket_msg/remote-msg.js"></script>
 
     <script src="../blockly_uncompressed_vertical.js"></script>
     <script src="../msg/messages.js"></script>
@@ -27,7 +30,7 @@
 
     <script>
       'use strict';
-
+      window.testSocket = new TestRemoteMsg();
       var workspace = null;
 
       function start() {
