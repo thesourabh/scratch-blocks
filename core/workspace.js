@@ -31,6 +31,7 @@ goog.require('Blockly.WorkspaceComment');
 goog.require('goog.array');
 goog.require('goog.math');
 
+goog.require('Blockly.BlockTransformer');
 
 /**
  * Class for a workspace.  This is a data structure that contains blocks.
@@ -113,6 +114,11 @@ Blockly.Workspace = function(opt_options) {
    * @private
    */
   this.potentialVariableMap_ = null;
+
+  /**
+   * BlockTransformer
+   */
+  this.blockTransformer = new Blockly.BlockTransformer(this);
 };
 
 /**
