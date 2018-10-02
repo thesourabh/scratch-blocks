@@ -189,8 +189,8 @@ Blockly.Blocks['data_listindexall'] = {
           "precision": 1,
           "options": [
             ["1", "1"],
-            ["last", "last"],
-            ["all", "all"]
+            [Blockly.Msg.DATA_INDEX_LAST, "last"],
+            [Blockly.Msg.DATA_INDEX_ALL, "all"]
           ]
         }
       ],
@@ -217,8 +217,8 @@ Blockly.Blocks['data_listindexrandom'] = {
           "precision": 1,
           "options": [
             ["1", "1"],
-            ["last", "last"],
-            ["random", "random"]
+            [Blockly.Msg.DATA_INDEX_LAST, "last"],
+            [Blockly.Msg.DATA_INDEX_RANDOM, "random"]
           ]
         }
       ],
@@ -266,6 +266,27 @@ Blockly.Blocks['data_deleteoflist'] = {
           "type": "input_value",
           "name": "INDEX"
         },
+        {
+          "type": "field_variable",
+          "name": "LIST",
+          "variableTypes": [Blockly.LIST_VARIABLE_TYPE]
+        }
+      ],
+      "category": Blockly.Categories.dataLists,
+      "extensions": ["colours_data_lists", "shape_statement"]
+    });
+  }
+};
+
+Blockly.Blocks['data_deletealloflist'] = {
+  /**
+   * Block to delete all items from list.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.DATA_DELETEALLOFLIST,
+      "args0": [
         {
           "type": "field_variable",
           "name": "LIST",
