@@ -173,7 +173,7 @@ Blockly.BlockSvg.NOTCH_PATH_LEFT = (
  * @const
  */
 Blockly.BlockSvg.NOTCH_PATH_RIGHT = (
-  'c -2,0 -3,1 -4,2 '+
+  'c -2,0 -3,1 -4,2 ' +
   'l -4,4 ' +
   'c -1,1 -2,2 -4,2 ' +
   'h -12 ' +
@@ -560,7 +560,9 @@ Blockly.BlockSvg.prototype.updateColour = function() {
  */
 Blockly.BlockSvg.prototype.highlightForReplacement = function(add) {
   if (add) {
-    this.svgPath_.setAttribute('filter', 'url(#blocklyReplacementGlowFilter)');
+    var replacementGlowFilterId = this.workspace.options.replacementGlowFilterId
+      || 'blocklyReplacementGlowFilter';
+    this.svgPath_.setAttribute('filter', 'url(#' + replacementGlowFilterId + ')');
     Blockly.utils.addClass(/** @type {!Element} */ (this.svgGroup_),
         'blocklyReplaceable');
   } else {
@@ -585,8 +587,10 @@ Blockly.BlockSvg.prototype.highlightShapeForInput = function(conn, add) {
     return;
   }
   if (add) {
+    var replacementGlowFilterId = this.workspace.options.replacementGlowFilterId
+      || 'blocklyReplacementGlowFilter';
     input.outlinePath.setAttribute('filter',
-        'url(#blocklyReplacementGlowFilter)');
+        'url(#' + replacementGlowFilterId + ')');
     Blockly.utils.addClass(/** @type {!Element} */ (this.svgGroup_),
         'blocklyReplaceable');
   } else {
@@ -631,8 +635,15 @@ Blockly.BlockSvg.prototype.render = function(opt_bubble) {
   }
   // Move the icons into position.
   var icons = this.getIcons();
+  var scratchCommentIcon = null;
   for (var i = 0; i < icons.length; i++) {
-    cursorX = icons[i].renderIcon(cursorX);
+    if (icons[i] instanceof Blockly.ScratchBlockComment) {
+      // Don't render scratch block comment icon until
+      // after the inputs
+      scratchCommentIcon = icons[i];
+    } else {
+      cursorX = icons[i].renderIcon(cursorX);
+    }
   }
   cursorX += this.RTL ?
       Blockly.BlockSvg.SEP_SPACE_X : -Blockly.BlockSvg.SEP_SPACE_X;
@@ -650,6 +661,13 @@ Blockly.BlockSvg.prototype.render = function(opt_bubble) {
   this.renderMoveConnections_();
 
   this.renderClassify_();
+
+  // Position the Scratch Block Comment Icon at the end of the block
+  if (scratchCommentIcon) {
+    var iconX = this.RTL ? -inputRows.rightEdge : inputRows.rightEdge;
+    var inputMarginY = inputRows[0].height / 2;
+    scratchCommentIcon.renderIcon(iconX, inputMarginY);
+  }
 
   if (opt_bubble !== false) {
     // Render all blocks above this one (propagate a reflow).
@@ -1434,7 +1452,7 @@ Blockly.BlockSvg.prototype.renderDrawLeft_ = function(steps) {
     // Draw the left-side edge shape.
     if (this.edgeShape_ === Blockly.OUTPUT_SHAPE_ROUND) {
       // Draw a rounded arc.
-      steps.push('a ' + this.edgeShapeWidth_ + ' ' + this.edgeShapeWidth_ + ' 0 0 1 0 -' + this.edgeShapeWidth_*2);
+      steps.push('a ' + this.edgeShapeWidth_ + ' ' + this.edgeShapeWidth_ + ' 0 0 1 0 -' + this.edgeShapeWidth_ * 2);
     } else if (this.edgeShape_ === Blockly.OUTPUT_SHAPE_HEXAGONAL) {
       // Draw a half-hexagon.
       steps.push('l ' + -this.edgeShapeWidth_ + ' ' + -this.edgeShapeWidth_ +
