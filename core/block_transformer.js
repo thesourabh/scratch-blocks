@@ -6,16 +6,34 @@ Blockly.BlockTransformer = function (workspace) {
 
 
 Blockly.BlockTransformer.prototype.doTransform = function (refactorable) {
-    // Fire a create event.
-      Blockly.Events.setGroup(true);
+    // Fire a group event for transformation sequence of a refactoring.
+    Blockly.Events.setGroup(true);
     try {
         console.log(refactorable);
         for (var action of refactorable.transforms) {
-            this.apply(action);
+            //TODO: WAIT apply in sequence!
+            try{
+               this.apply(action);
+            }catch(err){
+                throw "failed to apply transformation:"+
+                JSON.stringify(action)
+                +"\n"+err.message;
+            }
         }
     } finally {
         Blockly.Events.setGroup(false);
     }
+};
+
+Blockly.BlockTransformer.prototype.executeAction = function (action) {
+    try{
+        this.apply(action);
+    }catch(err){
+        throw "failed to apply transformation:"+
+        JSON.stringify(action)
+        +"\n"+err.message;
+    }
+    return true;
     
 };
 
@@ -48,12 +66,13 @@ Blockly.BlockTransformer.prototype.BlockCreateAction = function (action) {
 };
 
 Blockly.BlockTransformer.prototype.InsertBlockAction = function (action) {
+    console.log(action);
     let targetBlock = this.workspace.getBlockById(action.target_block);
     let insertedBlock = this.workspace.getBlockById(action.inserted_block);
-    
+
     //handle the case when there's a block connected to the block target
     let previousBlock = targetBlock.previousConnection.targetBlock();
-    let firstChildOfCBlock = previousBlock.childBlocks_.indexOf(targetBlock)===0; 
+    let firstChildOfCBlock = targetBlock.getPreviousBlock().getNextBlock() !== targetBlock;
     if (previousBlock) {
         if(firstChildOfCBlock){
             previousBlock.getFirstStatementConnection().connect(insertedBlock.previousConnection);
@@ -70,6 +89,7 @@ Blockly.BlockTransformer.prototype.InsertBlockAction = function (action) {
 };
 
 Blockly.BlockTransformer.prototype.ReplaceAction = function (action) {
+    console.log(action);
     var targetBlock = this.workspace.getBlockById(action.target_block);
     var targetBlockList = action.targetBlockList;
     var replaceWith = this.workspace.getBlockById(action.replace_with);
