@@ -6,23 +6,17 @@ Blockly.BlockTransformer = function (workspace) {
 
 
 Blockly.BlockTransformer.prototype.doTransform = function (refactorable) {
-    // Fire a group event for transformation sequence of a refactoring.
-    Blockly.Events.setGroup(true);
-    try {
         console.log(refactorable);
         for (var action of refactorable.transforms) {
-            //TODO: WAIT apply in sequence!
             try{
                this.apply(action);
+               Blockly.Events.fireNow_();
             }catch(err){
                 throw "failed to apply transformation:"+
                 JSON.stringify(action)
                 +"\n"+err.message;
             }
         }
-    } finally {
-        Blockly.Events.setGroup(false);
-    }
 };
 
 Blockly.BlockTransformer.prototype.executeAction = function (action) {
@@ -67,45 +61,81 @@ Blockly.BlockTransformer.prototype.BlockCreateAction = function (action) {
 
 Blockly.BlockTransformer.prototype.InsertBlockAction = function (action) {
     console.log(action);
-    let targetBlock = this.workspace.getBlockById(action.target_block);
-    let insertedBlock = this.workspace.getBlockById(action.inserted_block);
+    Blockly.Events.setGroup(true);
+    try{
+        let targetBlock = this.workspace.getBlockById(action.target_block);
+        let insertedBlock = this.workspace.getBlockById(action.inserted_block);
+        let previousBlock = targetBlock.previousConnection.targetBlock();
 
-    //handle the case when there's a block connected to the block target
-    let previousBlock = targetBlock.previousConnection.targetBlock();
-    let firstChildOfCBlock = targetBlock.getPreviousBlock().getNextBlock() !== targetBlock;
-    if (previousBlock) {
-        if(firstChildOfCBlock){
-            previousBlock.getFirstStatementConnection().connect(insertedBlock.previousConnection);
-        }else{
-            previousBlock.nextConnection.connect(insertedBlock.previousConnection);
+        if(previousBlock){
+            let moveEventJsonSpec = {
+                type: "move",
+                blockId: action.inserted_block, 
+                newParentId: previousBlock.id
+            }
+            let moveBlockEvent = new Blockly.Events.Move(null);
+            moveBlockEvent.fromJson(moveEventJsonSpec);
+            moveBlockEvent.workspaceId = this.workspace.id;
+            moveBlockEvent.run(true);
+        } else { //target block is the top block
+            let targetBlockXY = targetBlock.getRelativeToSurfaceXY();
+            // first move the inserted block close to the target first to prevent existing block jumping to connect to the new inserted block
+            let moveCloseToTargetEventJsonSpec = {
+                type: "move",
+                blockId: action.inserted_block,
+                newCoordinate:targetBlockXY.x+","+targetBlockXY.y
+            }
+            let moveBlockToTargetEvent = new Blockly.Events.Move(null); 
+            moveBlockToTargetEvent.fromJson(moveCloseToTargetEventJsonSpec); 
+            moveBlockToTargetEvent.workspaceId = this.workspace.id; 
+            moveBlockToTargetEvent.run(true);
+
+            let moveEventJsonSpec = {
+                type: "move",
+                blockId: targetBlock.id, 
+                newParentId: action.inserted_block
+            }
+
+            let moveBlockEvent = new Blockly.Events.Move(null); 
+            moveBlockEvent.fromJson(moveEventJsonSpec); 
+            moveBlockEvent.workspaceId = this.workspace.id; 
+            moveBlockEvent.run(true); 
         }
-    } else {
-        // place inserted block close to the postion of the target block to avoid block jump
-        let xy = targetBlock.getRelativeToSurfaceXY();
-        insertedBlock.moveBy(xy.x, xy.y);
+
+    }finally{
+        Blockly.Events.setGroup(false);
     }
-    targetBlock.previousConnection.connect(insertedBlock.nextConnection);
+
+    //TODO: when previous block is null because the inserted block become the top block
+     // place inserted block close to the postion of the target block to avoid block jump 
+    
+
     return true;
 };
 
 Blockly.BlockTransformer.prototype.ReplaceAction = function (action) {
     console.log(action);
+    Blockly.Events.setGroup(true);
+    
     var targetBlock = this.workspace.getBlockById(action.target_block);
-    var targetBlockList = action.targetBlockList;
-    var replaceWith = this.workspace.getBlockById(action.replace_with);
-    // if(!targetBlock){
-    // 	return;
-    // }
-    if (targetBlock) {
-        var parentConnection = targetBlock.outputConnection.targetConnection;
-        targetBlock.unplug(true, true);
-        parentConnection.connect(replaceWith.outputConnection);
-        // delete old value
-        targetBlock.dispose();
+    if(targetBlock){ //replacing expression input of block
+        try{
+            var replaceWith = this.workspace.getBlockById(action.replace_with);
+            if (targetBlock) {
+                var parentConnection = targetBlock.outputConnection.targetConnection;
+                // targetBlock.unplug(true, true);
+                parentConnection.connect(replaceWith.outputConnection);
+                // delete old value
+                targetBlock.dispose();
+            }
+        }finally{
+            Blockly.Events.setGroup(false);
+        }
     }
 
+    var targetBlockList = action.targetBlockList;
     //todo handle when targetBlockList has one block to replace (e.g. if block)
-    if (targetBlockList) {
+    if (targetBlockList) {  // replacing sequence of statements
         var targetBlocks = [];
         for (var blockID of targetBlockList) {
             targetBlocks.push(this.workspace.getBlockById(blockID));
