@@ -6,7 +6,6 @@ Blockly.BlockTransformer = function (workspace) {
 
 
 Blockly.BlockTransformer.prototype.doTransform = function (refactorable) {
-    console.log(refactorable);
     for (var action of refactorable.transforms) {
         try {
             this.apply(action);
@@ -71,7 +70,8 @@ Blockly.BlockTransformer.prototype.InsertBlockAction = function (action) {
             let moveEventJsonSpec = {
                 type: "move",
                 blockId: action.inserted_block,
-                newParentId: previousBlock.id
+                newParentId: previousBlock.id,
+                newInputName: "SUBSTACK"
             }
             let moveBlockEvent = new Blockly.Events.Move(null);
             moveBlockEvent.fromJson(moveEventJsonSpec);
