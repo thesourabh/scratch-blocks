@@ -67,11 +67,12 @@ Blockly.BlockTransformer.prototype.InsertBlockAction = function (action) {
         let previousBlock = targetBlock.previousConnection.targetBlock();
 
         if (previousBlock) {
+            let newInputName = previousBlock.getInputWithBlock(targetBlock)? previousBlock.getInputWithBlock(targetBlock).name:"";
             let moveEventJsonSpec = {
                 type: "move",
                 blockId: action.inserted_block,
                 newParentId: previousBlock.id,
-                newInputName: "SUBSTACK"
+                newInputName: newInputName
             }
             let moveBlockEvent = new Blockly.Events.Move(null);
             moveBlockEvent.fromJson(moveEventJsonSpec);
