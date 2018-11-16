@@ -27,7 +27,6 @@ Blockly.BlockTransformer.prototype.executeAction = function (action) {
         + "\n" + err.message;
     }
     return true;
-
 };
 
 Blockly.BlockTransformer.prototype.apply = function (action) {
@@ -36,7 +35,6 @@ Blockly.BlockTransformer.prototype.apply = function (action) {
 };
 
 Blockly.BlockTransformer.prototype.VarDeclareAction = function (action) {
-    console.log(action);
     let varCreateJson = {
         type: "var_create",
         varType: "",
@@ -52,33 +50,39 @@ Blockly.BlockTransformer.prototype.VarDeclareAction = function (action) {
 }
 
 Blockly.BlockTransformer.prototype.BlockCreateAction = function (action) {
-    console.log(action);
     let dom = Blockly.Xml.textToDom(action.block_xml).firstChild;
     let block = Blockly.Xml.domToBlock(dom, this.workspace);
     return true;
 };
 
 Blockly.BlockTransformer.prototype.InsertBlockAction = function (action) {
-    console.log(action);
     Blockly.Events.setGroup(true);
     try {
         let targetBlock = this.workspace.getBlockById(action.target_block);
         let insertedBlock = this.workspace.getBlockById(action.inserted_block);
         let previousBlock = targetBlock.previousConnection.targetBlock();
+        
+        let moveEventJsonSpec = null;
 
-        if (previousBlock) {
+        if(!action.before_target){
+            moveEventJsonSpec = {
+                type: "move",
+                blockId: action.inserted_block,
+                newParentId: targetBlock.id
+            }
+        }
+        
+        if (previousBlock &&action.before_target) {
             let newInputName = previousBlock.getInputWithBlock(targetBlock)? previousBlock.getInputWithBlock(targetBlock).name:"";
-            let moveEventJsonSpec = {
+            moveEventJsonSpec = {
                 type: "move",
                 blockId: action.inserted_block,
                 newParentId: previousBlock.id,
                 newInputName: newInputName
             }
-            let moveBlockEvent = new Blockly.Events.Move(null);
-            moveBlockEvent.fromJson(moveEventJsonSpec);
-            moveBlockEvent.workspaceId = this.workspace.id;
-            moveBlockEvent.run(true);
-        } else { //target block is the top block
+           
+        }
+        if(!previousBlock &&action.before_target) { //target block is the top block
             let targetBlockXY = targetBlock.getRelativeToSurfaceXY();
             // first move the inserted block close to the target first to prevent existing block jumping to connect to the new inserted block
             let moveCloseToTargetEventJsonSpec = {
@@ -91,17 +95,17 @@ Blockly.BlockTransformer.prototype.InsertBlockAction = function (action) {
             moveBlockToTargetEvent.workspaceId = this.workspace.id;
             moveBlockToTargetEvent.run(true);
 
-            let moveEventJsonSpec = {
+            moveEventJsonSpec = {
                 type: "move",
                 blockId: targetBlock.id,
                 newParentId: action.inserted_block
-            }
+            }           
+        }
 
-            let moveBlockEvent = new Blockly.Events.Move(null);
+         let moveBlockEvent = new Blockly.Events.Move(null);
             moveBlockEvent.fromJson(moveEventJsonSpec);
             moveBlockEvent.workspaceId = this.workspace.id;
             moveBlockEvent.run(true);
-        }
 
     } finally {
         Blockly.Events.setGroup(false);
@@ -109,8 +113,6 @@ Blockly.BlockTransformer.prototype.InsertBlockAction = function (action) {
 
     //TODO: when previous block is null because the inserted block become the top block
     // place inserted block close to the postion of the target block to avoid block jump 
-
-
     return true;
 };
 
@@ -122,7 +124,6 @@ Blockly.BlockTransformer.prototype.ReplaceSeqAction = function (action) {
 }
 
 Blockly.BlockTransformer.prototype.ReplaceAction = function (action) {
-    console.log(action);
     Blockly.Events.setGroup(true);
     var targetBlock = this.workspace.getBlockById(action.target_block);
     var replaceWith = this.workspace.getBlockById(action.replace_with);
