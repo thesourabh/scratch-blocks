@@ -642,7 +642,7 @@ Blockly.BlockSvg.prototype.render = function(opt_bubble) {
   var icons = this.getIcons();
   var scratchCommentIcon = null;
   for (var i = 0; i < icons.length; i++) {
-    if (icons[i] instanceof Blockly.ScratchBlockComment) {
+    if (icons[i] instanceof Blockly.ScratchBlockComment || icons[i] instanceof Blockly.Hint) {
       // Don't render scratch block comment icon until
       // after the inputs
       scratchCommentIcon = icons[i];
@@ -672,6 +672,12 @@ Blockly.BlockSvg.prototype.render = function(opt_bubble) {
     var iconX = this.RTL ? -inputRows.rightEdge : inputRows.rightEdge;
     var inputMarginY = inputRows[0].height / 2;
     scratchCommentIcon.renderIcon(iconX, inputMarginY);
+  }
+
+  if (this.hint) {
+    var iconX = this.RTL ? -inputRows.rightEdge : inputRows.rightEdge;
+    var inputMarginY = inputRows[0].height / 2;
+    this.hint.renderIcon(iconX, inputMarginY);
   }
 
   if (opt_bubble !== false) {
