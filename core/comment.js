@@ -188,6 +188,7 @@ Blockly.Comment.prototype.setVisible = function(visible) {
     // http://msdn.microsoft.com/en-us/library/hh834675%28v=vs.85%29.aspx
     // Always treat comments in IE as uneditable.
     Blockly.Warning.prototype.setVisible.call(this, visible);
+    Blockly.Hint.prototype.setVisible.call(this, visible);
     return;
   }
   // Save the bubble stats before the visibility switch.
