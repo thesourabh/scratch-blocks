@@ -112,6 +112,7 @@
           // Restore flyout event logging state.
           state = sessionStorage.getItem('logFlyoutEvents');
           logFlyoutEvents(Boolean(state));
+          showHintSetup();
         }
       }
 
@@ -306,6 +307,19 @@
           );
         }
       }
+
+      function showHintSetup(){ 
+        var input = document.getElementById('importExport'); 
+        input.value = "<xml xmlns='http://www.w3.org/1999/xhtml'><variables></variables><block type='motion_movesteps' id='*`#p/~R4kNb@uT|}iU@u' x='525' y='496'><value name='STEPS'><shadow type='math_number' id='{H`(3cDLOp*BR%OM3t1j'><field name='NUM'>10</field></shadow></value></block></xml>"; 
+        fromXml(); 
+         
+        Blockly.selected = workspace.getBlockById('*`#p/~R4kNb@uT|}iU@u'); 
+        if (Blockly.selected) { 
+          Blockly.selected.setHintText("abc");
+          Blockly.selected.hint.setVisible(true);
+        } 
+        
+      } 
 
       function setLocale(locale) {
         workspace.getFlyout().setRecyclingEnabled(false);
