@@ -47,22 +47,40 @@ Blockly.Hint.prototype.drawIcon_ = function(group) {
   // Can't use a real '!' text character since different browsers and operating
   // systems render it differently.
   // Body of exclamation point.
-  Blockly.utils.createSvgElement('path',
-      {
-        'class': 'blocklyIconSymbol',
-        'd': 'm7,4.8v3.16l0.27,2.27h1.46l0.27,-2.27v-3.16z'
-      },
-      group);
-  // Dot of exclamation point.
-  Blockly.utils.createSvgElement('rect',
-      {
-        'class': 'blocklyIconSymbol',
-        'x': '7',
-        'y': '11',
-        'height': '2',
-        'width': '2'
-      },
-      group);
+  
+};
+
+
+// Override renderIcon from Blocky.Icon so that the comment bubble is
+// anchored correctly on the block. This function takes in the top margin
+// as an input instead of setting an arbitrary one.
+/**
+ * Render the icon.
+ * @param {number} cursorX Horizontal offset at which to position the icon.
+ * @param {number} topMargin Vertical offset from the top of the block to position the icon.
+ * @return {number} Horizontal offset for next item to draw.
+ * @package
+ */
+Blockly.Hint.prototype.renderIcon = function(cursorX, topMargin) {
+  if (this.collapseHidden && this.block_.isCollapsed()) {
+    this.iconGroup_.setAttribute('display', 'none');
+    return cursorX;
+  }
+  this.iconGroup_.setAttribute('display', 'block');
+
+  var width = this.SIZE;
+  if (this.block_.RTL) {
+    cursorX -= width;
+  }
+  this.iconGroup_.setAttribute('transform',
+      'translate(' + cursorX + ',' + topMargin + ')');
+  this.computeIconLocation();
+  if (this.block_.RTL) {
+    cursorX -= Blockly.BlockSvg.SEP_SPACE_X;
+  } else {
+    cursorX += width + Blockly.BlockSvg.SEP_SPACE_X;
+  }
+  return cursorX;
 };
 
 /**
