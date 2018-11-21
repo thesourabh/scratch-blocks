@@ -7,7 +7,7 @@
 
 goog.provide('Blockly.Hint');
 
-goog.require('Blockly.Bubble');
+goog.require('Blockly.HintBubble');
 goog.require('Blockly.Events.Ui');
 goog.require('Blockly.Icon');
 
@@ -80,6 +80,7 @@ Blockly.Hint.prototype.renderIcon = function(cursorX, topMargin) {
   } else {
     cursorX += width + Blockly.BlockSvg.SEP_SPACE_X;
   }
+
   return cursorX;
 };
 
@@ -110,6 +111,21 @@ Blockly.Hint.textToDom_ = function(text) {
 };
 
 /**
+ * Size this hint's bubble.
+ * @param {number} width Width of the bubble.
+ * @param {number} height Height of the bubble.
+ */
+Blockly.Hint.prototype.setBubbleSize = function(width, height) {
+  if (this.textarea_) {
+    this.bubble_.setBubbleSize(width, height);
+  } else {
+    this.width_ = width;
+    this.height_ = height;
+  }
+};
+
+
+/**
  * Show or hide the hint bubble.
  * @param {boolean} visible True if the bubble should be visible.
  */
@@ -118,14 +134,17 @@ Blockly.Hint.prototype.setVisible = function(visible) {
     // No change.
     return;
   }
-  Blockly.Events.fire(
-      new Blockly.Events.Ui(this.block_, 'warningOpen', !visible, visible));
+  
   if (visible) {
     // Create the bubble to display all hints.
     var paragraph = Blockly.Hint.textToDom_(this.getText());
-    this.bubble_ = new Blockly.Bubble(
+    var content = paragraph;
+    content = this.createHintIcon_();
+    this.bubble_ = new Blockly.HintBubble(
         /** @type {!Blockly.WorkspaceSvg} */ (this.block_.workspace),
-        paragraph, this.block_.svgPath_, this.iconXY_, null, null);
+        content, this.block_.svgPath_, this.iconXY_, null, null);
+    // specific for hint
+
     if (this.block_.RTL) {
       // Right-align the paragraph.
       // This cannot be done until the bubble is rendered on screen.
@@ -146,6 +165,25 @@ Blockly.Hint.prototype.setVisible = function(visible) {
     this.body_ = null;
   }
 };
+
+Blockly.Hint.prototype.createHintIcon_ = function(){
+  let iconGroup_ =  Blockly.utils.createSvgElement('g', {'class': 'blocklyIconGroup'}, null);
+  let WIDTH_ = 8*Blockly.BlockSvg.GRID_UNIT;
+  let HEIGHT_ = 8*Blockly.BlockSvg.GRID_UNIT;
+  let lightbulbSvgPath = '/icons/set-led_yellow.svg';
+  var lightbulbSvg = Blockly.utils.createSvgElement(
+      'image',
+      {
+        'width': WIDTH_,
+        'height': HEIGHT_
+      },
+      iconGroup_
+    );
+  lightbulbSvg.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href',
+  this.block_.workspace.options.pathToMedia + lightbulbSvgPath);
+
+  return iconGroup_;
+}
 
 /**
  * Bring the hint to the top of the stack when clicked on.
@@ -196,3 +234,5 @@ Blockly.Hint.prototype.dispose = function() {
   this.block_.hint = null;
   Blockly.Icon.prototype.dispose.call(this);
 };
+
+
