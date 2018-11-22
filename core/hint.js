@@ -38,15 +38,31 @@ Blockly.Hint.prototype.collapseHidden = false;
  */
 Blockly.Hint.prototype.drawIcon_ = function(group) {
   // Triangle with rounded corners.
-  Blockly.utils.createSvgElement('path',
+  // Blockly.utils.createSvgElement('path',
+  //     {
+  //       'class': 'blocklyIconShape',
+  //       'd': 'M2,15Q-1,15 0.5,12L6.5,1.7Q8,-1 9.5,1.7L15.5,12Q17,15 14,15z'
+  //     },
+  //     group);
+  Blockly.utils.createSvgElement('rect',
       {
-        'class': 'blocklyIconShape',
-        'd': 'M2,15Q-1,15 0.5,12L6.5,1.7Q8,-1 9.5,1.7L15.5,12Q17,15 14,15z'
+        'class': 'blocklyResizeLine',
+        'x': 0,
+        'y': 0,
+        'rx': 2,
+        'ry': 2,
+        'width': 10,
+        'height':10
       },
       group);
-  // Can't use a real '!' text character since different browsers and operating
-  // systems render it differently.
-  // Body of exclamation point.
+
+//   Blockly.utils.createSvgElement('line',
+//     {
+//       'class': 'blocklyResizeLine',
+//       'x1': 0, 'y1': 0,
+//       'x2': 10, 'y2': 0
+//     }, group
+//   );
   
 };
 
@@ -144,6 +160,7 @@ Blockly.Hint.prototype.setVisible = function(visible) {
         /** @type {!Blockly.WorkspaceSvg} */ (this.block_.workspace),
         content, this.block_.svgPath_, this.iconXY_, null, null);
     // specific for hint
+    this.bubble_.registerContextMenuCallback(this.showContextMenu_.bind(this));
 
     if (this.block_.RTL) {
       // Right-align the paragraph.
@@ -165,6 +182,20 @@ Blockly.Hint.prototype.setVisible = function(visible) {
     this.body_ = null;
   }
 };
+
+/**
+ * Show the context menu for this comment's bubble.
+ * @param {!Event} e The mouse event
+ * @private
+ */
+Blockly.Hint.prototype.showContextMenu_ = function(e) { 
+  var menuOptions = [];
+  menuOptions.push(Blockly.ContextMenu.commentDeleteOption(this, Blockly.Msg.DELETE));
+  Blockly.ContextMenu.show(e, menuOptions, this.block_.RTL);
+  console.log("show: Improve Option");
+  //todo: fine tune area to trigger context menu
+};
+
 
 Blockly.Hint.prototype.createHintIcon_ = function(){
   let iconGroup_ =  Blockly.utils.createSvgElement('g', {'class': 'blocklyIconGroup'}, null);

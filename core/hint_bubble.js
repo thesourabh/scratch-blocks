@@ -59,7 +59,7 @@ Blockly.HintBubble = function(workspace, content, shape, anchorXY,
 
   var canvas = workspace.getBubbleCanvas();
   canvas.appendChild(this.createDom_(content, !!(bubbleWidth && bubbleHeight)));
-
+  
   this.setAnchorLocation(anchorXY);
   if (!bubbleWidth || !bubbleHeight) {
     var bBox = /** @type {SVGLocatable} */ (this.content_).getBBox();
@@ -76,11 +76,23 @@ Blockly.HintBubble = function(workspace, content, shape, anchorXY,
   if (!workspace.options.readOnly) {
     Blockly.bindEventWithChecks_(
         this.bubbleBack_, 'mousedown', this, this.bubbleMouseDown_);
-    if (this.resizeGroup_) {
-      Blockly.bindEventWithChecks_(
-          this.resizeGroup_, 'mousedown', this, this.resizeMouseDown_);
-    }
+    // if (this.resizeGroup_) {
+    //   Blockly.bindEventWithChecks_(
+    //       this.resizeGroup_, 'mousedown', this, this.resizeMouseDown_);
+    // }
   }
+
+  // Blockly.bindEventWithChecks_(
+  //       this.bubbleBack_, 'mousedown', this, this.bubbleMouseDown_);
+};
+
+/**
+ * Register a function as a callback to show the context menu for this comment.
+ * @param {!Function} callback The function to call on resize.
+ * @package
+ */
+Blockly.HintBubble.prototype.registerContextMenuCallback = function(callback) {
+  this.contextMenuCallback_ = callback;
 };
 
 /**
@@ -297,6 +309,12 @@ Blockly.HintBubble.prototype.setSvgId = function(id) {
  * @private
  */
 Blockly.HintBubble.prototype.bubbleMouseDown_ = function(e) {
+  if (!Blockly.utils.isRightButton(e)) {
+    // No mouse drag on hint bubble.
+    e.stopPropagation();
+    return;
+  }
+
   var gesture = this.workspace_.getGesture(e);
   if (gesture) {
     gesture.handleBubbleStart(e, this);
@@ -311,7 +329,9 @@ Blockly.HintBubble.prototype.bubbleMouseDown_ = function(e) {
 Blockly.HintBubble.prototype.showContextMenu_ = function(_e) {
   // NOP on bubbles, but used by the bubble dragger to pass events to
   // workspace comments.
-  console.log('todo: show context menu');
+  if (this.contextMenuCallback_) {
+    this.contextMenuCallback_(_e);
+  }
 };
 
 /**
@@ -631,18 +651,19 @@ Blockly.HintBubble.prototype.dispose = function() {
  * @package
  */
 Blockly.HintBubble.prototype.moveDuringDrag = function(dragSurface, newLoc) {
-  if (dragSurface) {
-    dragSurface.translateSurface(newLoc.x, newLoc.y);
-  } else {
-    this.moveTo(newLoc.x, newLoc.y);
-  }
-  if (this.workspace_.RTL) {
-    this.relativeLeft_ = this.anchorXY_.x - newLoc.x - this.width_;
-  } else {
-    this.relativeLeft_ = newLoc.x - this.anchorXY_.x;
-  }
-  this.relativeTop_ = newLoc.y - this.anchorXY_.y;
-  this.renderArrow_();
+  console.log("should not move during drag")
+  // if (dragSurface) {
+  //   dragSurface.translateSurface(newLoc.x, newLoc.y);
+  // } else {
+  //   this.moveTo(newLoc.x, newLoc.y);
+  // }
+  // if (this.workspace_.RTL) {
+  //   this.relativeLeft_ = this.anchorXY_.x - newLoc.x - this.width_;
+  // } else {
+  //   this.relativeLeft_ = newLoc.x - this.anchorXY_.x;
+  // }
+  // this.relativeTop_ = newLoc.y - this.anchorXY_.y;
+  // this.renderArrow_();
 };
 
 /**
@@ -653,8 +674,8 @@ Blockly.HintBubble.prototype.moveDuringDrag = function(dragSurface, newLoc) {
  */
 Blockly.HintBubble.prototype.getRelativeToSurfaceXY = function() {
   return new goog.math.Coordinate(
-      this.workspace_.RTL ? this.anchorXY_.x - this.relativeLeft_ : this.anchorXY_.x + this.relativeLeft_,
-      this.anchorXY_.y + this.relativeTop_);
+    this.anchorXY_.x - 15,
+    this.anchorXY_.y-this.height_);
 };
 
 /**
