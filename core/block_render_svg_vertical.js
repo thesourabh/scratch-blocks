@@ -642,11 +642,15 @@ Blockly.BlockSvg.prototype.render = function(opt_bubble) {
   var icons = this.getIcons();
   var scratchCommentIcon = null;
   for (var i = 0; i < icons.length; i++) {
-    if (icons[i] instanceof Blockly.ScratchBlockComment || icons[i] instanceof Blockly.Hint) {
+    if (icons[i] instanceof Blockly.ScratchBlockComment) {
       // Don't render scratch block comment icon until
       // after the inputs
       scratchCommentIcon = icons[i];
-    } else {
+    } 
+    else if (icons[i] instanceof Blockly.Hint){
+      //do nothing for hint
+    }
+    else {
       cursorX = icons[i].renderIcon(cursorX);
     }
   }
