@@ -70,20 +70,12 @@ Blockly.HintBubble = function(workspace, content, shape, anchorXY,
 
   // Render the bubble.
   this.positionBubble_();
-  this.renderArrow_();
   this.rendered_ = true;
 
   if (!workspace.options.readOnly) {
     Blockly.bindEventWithChecks_(
-        this.bubbleBack_, 'mousedown', this, this.bubbleMouseDown_);
-    // if (this.resizeGroup_) {
-    //   Blockly.bindEventWithChecks_(
-    //       this.resizeGroup_, 'mousedown', this, this.resizeMouseDown_);
-    // }
+        this.content_, 'mousedown', this, this.bubbleMouseDown_);
   }
-
-  // Blockly.bindEventWithChecks_(
-  //       this.bubbleBack_, 'mousedown', this, this.bubbleMouseDown_);
 };
 
 /**
@@ -234,53 +226,8 @@ Blockly.HintBubble.prototype.createDom_ = function(content, hasResize) {
   </g>
   */
   this.bubbleGroup_ = Blockly.utils.createSvgElement('g', {}, null);
-  var filter =
-      {'filter': 'url(#' + this.workspace_.options.embossFilterId + ')'};
-  if (goog.userAgent.getUserAgentString().indexOf('JavaFX') != -1) {
-    // Multiple reports that JavaFX can't handle filters.  UserAgent:
-    // Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.44
-    //     (KHTML, like Gecko) JavaFX/8.0 Safari/537.44
-    // https://github.com/google/blockly/issues/99
-    filter = {};
-  }
-  var bubbleEmboss = Blockly.utils.createSvgElement('g',
-      filter, this.bubbleGroup_);
-  this.bubbleArrow_ = Blockly.utils.createSvgElement('path', {}, bubbleEmboss);
-  this.bubbleBack_ = Blockly.utils.createSvgElement('rect',
-      {
-        'class': 'blocklyDraggable',
-        'x': 0,
-        'y': 0,
-        'rx': Blockly.HintBubble.BORDER_WIDTH,
-        'ry': Blockly.HintBubble.BORDER_WIDTH
-      },
-      bubbleEmboss);
-  if (hasResize) {
-    this.resizeGroup_ = Blockly.utils.createSvgElement('g',
-        {'class': this.workspace_.RTL ?
-                  'blocklyResizeSW' : 'blocklyResizeSE'},
-        this.bubbleGroup_);
-    var resizeSize = 2 * Blockly.HintBubble.BORDER_WIDTH;
-    Blockly.utils.createSvgElement('polygon',
-        {'points': '0,x x,x x,0'.replace(/x/g, resizeSize.toString())},
-        this.resizeGroup_);
-    Blockly.utils.createSvgElement('line',
-        {
-          'class': 'blocklyResizeLine',
-          'x1': resizeSize / 3, 'y1': resizeSize - 1,
-          'x2': resizeSize - 1, 'y2': resizeSize / 3
-        }, this.resizeGroup_);
-    Blockly.utils.createSvgElement('line',
-        {
-          'class': 'blocklyResizeLine',
-          'x1': resizeSize * 2 / 3,
-          'y1': resizeSize - 1,
-          'x2': resizeSize - 1,
-          'y2': resizeSize * 2 / 3
-        }, this.resizeGroup_);
-  } else {
-    this.resizeGroup_ = null;
-  }
+  this.resizeGroup_ = null;
+  
   this.bubbleGroup_.appendChild(content);
   return this.bubbleGroup_;
 };
@@ -514,8 +461,7 @@ Blockly.HintBubble.prototype.setBubbleSize = function(width, height) {
   height = Math.max(height, doubleBorderWidth + 20);
   this.width_ = width;
   this.height_ = height;
-  this.bubbleBack_.setAttribute('width', width);
-  this.bubbleBack_.setAttribute('height', height);
+  
   if (this.resizeGroup_) {
     if (this.workspace_.RTL) {
       // Mirror the resize group.
@@ -533,7 +479,6 @@ Blockly.HintBubble.prototype.setBubbleSize = function(width, height) {
       this.layoutBubble_();
     }
     this.positionBubble_();
-    this.renderArrow_();
   }
   // Allow the contents to resize.
   if (this.resizeCallback_) {
@@ -621,8 +566,7 @@ Blockly.HintBubble.prototype.renderArrow_ = function() {
  * @param {string} hexColour Hex code of colour.
  */
 Blockly.HintBubble.prototype.setColour = function(hexColour) {
-  this.bubbleBack_.setAttribute('fill', hexColour);
-  this.bubbleArrow_.setAttribute('fill', hexColour);
+  
 };
 
 /**
@@ -634,7 +578,6 @@ Blockly.HintBubble.prototype.dispose = function() {
   goog.dom.removeNode(this.bubbleGroup_);
   this.bubbleGroup_ = null;
   this.bubbleArrow_ = null;
-  this.bubbleBack_ = null;
   this.resizeGroup_ = null;
   this.workspace_ = null;
   this.content_ = null;
@@ -652,18 +595,6 @@ Blockly.HintBubble.prototype.dispose = function() {
  */
 Blockly.HintBubble.prototype.moveDuringDrag = function(dragSurface, newLoc) {
   console.log("should not move during drag")
-  // if (dragSurface) {
-  //   dragSurface.translateSurface(newLoc.x, newLoc.y);
-  // } else {
-  //   this.moveTo(newLoc.x, newLoc.y);
-  // }
-  // if (this.workspace_.RTL) {
-  //   this.relativeLeft_ = this.anchorXY_.x - newLoc.x - this.width_;
-  // } else {
-  //   this.relativeLeft_ = newLoc.x - this.anchorXY_.x;
-  // }
-  // this.relativeTop_ = newLoc.y - this.anchorXY_.y;
-  // this.renderArrow_();
 };
 
 /**

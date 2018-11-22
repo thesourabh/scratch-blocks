@@ -37,32 +37,17 @@ Blockly.Hint.prototype.collapseHidden = false;
  * @private
  */
 Blockly.Hint.prototype.drawIcon_ = function(group) {
-  // Triangle with rounded corners.
-  // Blockly.utils.createSvgElement('path',
+  // Blockly.utils.createSvgElement('rect',
   //     {
-  //       'class': 'blocklyIconShape',
-  //       'd': 'M2,15Q-1,15 0.5,12L6.5,1.7Q8,-1 9.5,1.7L15.5,12Q17,15 14,15z'
+  //       'class': 'blocklyResizeLine',
+  //       'x': 0,
+  //       'y': 0,
+  //       'rx': 2,
+  //       'ry': 2,
+  //       'width': 10,
+  //       'height':10
   //     },
   //     group);
-  Blockly.utils.createSvgElement('rect',
-      {
-        'class': 'blocklyResizeLine',
-        'x': 0,
-        'y': 0,
-        'rx': 2,
-        'ry': 2,
-        'width': 10,
-        'height':10
-      },
-      group);
-
-//   Blockly.utils.createSvgElement('line',
-//     {
-//       'class': 'blocklyResizeLine',
-//       'x1': 0, 'y1': 0,
-//       'x2': 10, 'y2': 0
-//     }, group
-//   );
   
 };
 
