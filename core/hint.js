@@ -47,8 +47,7 @@ Blockly.Hint.prototype.drawIcon_ = function(group) {
   //       'width': 10,
   //       'height':10
   //     },
-  //     group);
-  
+  //     group);  
 };
 
 
@@ -175,11 +174,53 @@ Blockly.Hint.prototype.setVisible = function(visible) {
  */
 Blockly.Hint.prototype.showContextMenu_ = function(e) { 
   var menuOptions = [];
-  menuOptions.push(Blockly.ContextMenu.commentDeleteOption(this, Blockly.Msg.DELETE));
+  // menuOptions.push(Blockly.ContextMenu.commentDeleteOption(this, Blockly.Msg.DELETE));
+  menuOptions.push(Blockly.Hint.hintImproveOption(this));
+  menuOptions.push(Blockly.Hint.hintLearnMoreOption(this));
+
   Blockly.ContextMenu.show(e, menuOptions, this.block_.RTL);
-  console.log("show: Improve Option");
-  //todo: fine tune area to trigger context menu
 };
+
+/**
+ * Make a context menu option for action resolving the hint
+ * @param {!Blockly.Hint} hint The hint where the
+ *     right-click originated.
+ * @return {!Object} A menu option, containing text, enabled, and a callback.
+ * @package
+ */
+Blockly.Hint.hintImproveOption = function() {
+  var hintOption = {
+    text: "Help me improve!",
+    enabled: true,
+    callback: function() {
+      console.log("TODO: call to improve")
+    }
+  };
+  return hintOption;
+};
+
+
+/**
+ * Make a context menu option for action learn more about the hint
+ * @param {!Blockly.Hint} hint The hint where the
+ *     right-click originated.
+ * @return {!Object} A menu option, containing text, enabled, and a callback.
+ * @package
+ */
+Blockly.Hint.hintLearnMoreOption = function() {
+  var hintOption = {
+    text: "Learn more",
+    enabled: true,
+    callback: function() {
+      console.log("TODO: call to learn more about this hint")
+    }
+  };
+  return hintOption;
+};
+
+Blockly.Hint.prototype.setText = function(text, id) {
+  //NOOP
+}
 
 
 Blockly.Hint.prototype.createHintIcon_ = function(){
