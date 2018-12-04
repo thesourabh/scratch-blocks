@@ -646,7 +646,11 @@ Blockly.BlockSvg.prototype.render = function(opt_bubble) {
       // Don't render scratch block comment icon until
       // after the inputs
       scratchCommentIcon = icons[i];
-    } else {
+    } 
+    else if (icons[i] instanceof Blockly.Hint){
+      //do nothing for hint
+    }
+    else {
       cursorX = icons[i].renderIcon(cursorX);
     }
   }
@@ -672,6 +676,12 @@ Blockly.BlockSvg.prototype.render = function(opt_bubble) {
     var iconX = this.RTL ? -inputRows.rightEdge : inputRows.rightEdge;
     var inputMarginY = inputRows[0].height / 2;
     scratchCommentIcon.renderIcon(iconX, inputMarginY);
+  }
+
+  if (this.hint) {
+    var iconX = this.RTL ? -inputRows.rightEdge : inputRows.rightEdge;
+    var inputMarginY = inputRows[0].height / 2;
+    this.hint.renderIcon(iconX, inputMarginY);
   }
 
   if (opt_bubble !== false) {

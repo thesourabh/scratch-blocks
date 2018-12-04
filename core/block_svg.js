@@ -262,6 +262,12 @@ Blockly.BlockSvg.prototype.comment = null;
 Blockly.BlockSvg.prototype.warning = null;
 
 /**
+ * Block's hint icon (if any).
+ * @type {Blockly.Hint}
+ */
+Blockly.BlockSvg.prototype.hint = null;
+
+/**
  * Returns a list of mutator, comment, and warning icons.
  * @return {!Array} List of icons.
  */
@@ -275,6 +281,9 @@ Blockly.BlockSvg.prototype.getIcons = function() {
   }
   if (this.warning) {
     icons.push(this.warning);
+  }
+  if (this.hint) {
+    icons.push(this.hint);
   }
   return icons;
 };
@@ -985,6 +994,76 @@ Blockly.BlockSvg.prototype.setWarningText = function(text, opt_id) {
   if (changedState && this.rendered) {
     this.render();
     // Adding or removing a warning icon will cause the block to change shape.
+    this.bumpNeighbours_();
+  }
+};
+
+
+/**
+ * Set this block's hint text.
+ * @param {?string} text The text, or null to delete.
+ * @param {string=} opt_id An optional ID for the hint text to be able to
+ *     maintain multiple hints.
+ */
+Blockly.BlockSvg.prototype.setHintText = function(text, opt_id) {
+  if (!this.setHintText.pid_) {
+    // Create a database of hint PIDs.
+    // Only runs once per block (and only those with hints).
+    this.setHintText.pid_ = Object.create(null);
+  }
+  var id = opt_id || '';
+  if (!id) {
+    // Kill all previous pending processes, this edit supersedes them all.
+    for (var n in this.setHintText.pid_) {
+      clearTimeout(this.setHintText.pid_[n]);
+      delete this.setHintText.pid_[n];
+    }
+  } else if (this.setHintText.pid_[id]) {
+    // Only queue up the latest change.  Kill any earlier pending process.
+    clearTimeout(this.setHintText.pid_[id]);
+    delete this.setHintText.pid_[id];
+  }
+  if (this.workspace.isDragging()) {
+    // Don't change the hint text during a drag.
+    // Wait until the drag finishes.
+    var thisBlock = this;
+    this.setHintText.pid_[id] = setTimeout(function() {
+      if (thisBlock.workspace) {  // Check block wasn't deleted.
+        delete thisBlock.setHintText.pid_[id];
+        thisBlock.setHintText(text, id);
+      }
+    }, 100);
+    return;
+  }
+  if (this.isInFlyout) {
+    text = null;
+  }
+
+  var changedState = false;
+  if (goog.isString(text)) {
+    if (!this.hint) {
+      this.hint = new Blockly.Hint(this);
+      changedState = true;
+    }
+    this.hint.setText(/** @type {string} */ (text), id);
+  } else {
+    // Dispose all hints if no ID is given.
+    if (this.hint && !id) {
+      this.hint.dispose();
+      changedState = true;
+    } else if (this.hint) {
+      var oldText = this.hint.getText();
+      this.hint.setText('', id);
+      var newText = this.hint.getText();
+      if (!newText) {
+        this.hint.dispose();
+      }
+      changedState = oldText != newText;
+    }
+  }
+  if (changedState && this.rendered) {
+    this.render();
+    // Adding or removing a hint icon will cause the block to change shape.
     this.bumpNeighbours_();
   }
 };

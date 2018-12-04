@@ -39,6 +39,7 @@ goog.require('Blockly.Extensions');
 goog.require('Blockly.FieldLabelSerializable');
 goog.require('Blockly.FieldVariableGetter');
 goog.require('Blockly.Input');
+goog.require('Blockly.Hint');
 goog.require('Blockly.Mutator');
 goog.require('Blockly.Warning');
 goog.require('Blockly.Workspace');
