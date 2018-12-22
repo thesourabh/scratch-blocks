@@ -49,6 +49,21 @@ Blockly.BlockTransformer.prototype.VarDeclareAction = function (action) {
     return true;
 }
 
+Blockly.BlockTransformer.prototype.VarRename = function (action) {
+    let varRenameJson = {
+        type: "var_rename",
+        varId: action.id,
+        oldName: action.oldName,
+        newName: action.newName
+    };
+
+    let varRenameEvent = new Blockly.Events.VarRename(null);
+    varRenameEvent.fromJson(varRenameJson);
+    varRenameEvent.workspaceId = this.workspace.id;
+    varRenameEvent.run(true);
+    return true;
+}
+
 Blockly.BlockTransformer.prototype.BlockCreateAction = function (action) {
     let dom = Blockly.Xml.textToDom(action.block_xml).firstChild;
     let block = Blockly.Xml.domToBlock(dom, this.workspace);
