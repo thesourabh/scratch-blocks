@@ -188,12 +188,16 @@ Blockly.Hint.prototype.showContextMenu_ = function(e) {
  * @return {!Object} A menu option, containing text, enabled, and a callback.
  * @package
  */
-Blockly.Hint.hintImproveOption = function() {
+Blockly.Hint.hintImproveOption = function(hint) {
+  let wsId = hint.block_.workspace.id;
   var hintOption = {
     text: "Help me improve!",
     enabled: true,
     callback: function() {
-      console.log("TODO: call to improve")
+      console.log("Hint callback to improve get invoked");
+      var event = new Blockly.Events.HintClick(hint);
+      event.workspaceId = wsId;
+      Blockly.Events.fire(event);
     }
   };
   return hintOption;
