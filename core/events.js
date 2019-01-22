@@ -163,6 +163,8 @@ Blockly.Events.COMMENT_DELETE = 'comment_delete';
  */
 Blockly.Events.UI = 'ui';
 
+Blockly.Events.HINT_CLICK = 'hint_click';
+
 /**
  * List of events queued for firing.
  * @private

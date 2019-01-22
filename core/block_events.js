@@ -529,3 +529,27 @@ Blockly.Events.Move.prototype.run = function(forward) {
     }
   }
 };
+
+
+
+/**
+ * Class for a hint click event.  
+ * @param {Blockly.Block} block The moved block.  Null for a blank event.
+ * @extends {Blockly.Events.BlockBase}
+ * @constructor
+ */
+Blockly.Events.HintClick = function(hint) {
+  if (!hint) {
+    return;  // Blank event to be populated by fromJson.
+  }
+  Blockly.Events.HintClick.superClass_.constructor.call(this);
+  this.hintId = hint.getText();
+  this.recordUndo = false;
+};
+goog.inherits(Blockly.Events.HintClick, Blockly.Events.Abstract);
+
+/**
+ * Type of this event.
+ * @type {string}
+ */
+Blockly.Events.HintClick.prototype.type = Blockly.Events.HINT_CLICK;
