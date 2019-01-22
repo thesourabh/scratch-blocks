@@ -246,7 +246,7 @@ Blockly.Css.CONTENT = [
     'box-shadow: 0px 0px 8px 1px ' + Blockly.Colours.dropDownShadow + ';',
     'padding: 4px;',
     '-webkit-user-select: none;',
-    'min-height: 26px',
+    'min-height: 15px',
   '}',
 
   '.blocklyDropDownContent {',
@@ -650,6 +650,7 @@ Blockly.Css.CONTENT = [
 
   '.scratchCommentBody {',
     'background-color: #fef49c;',
+    'border-radius: 4px;',
   '}',
 
   '.scratchCommentRect {',
@@ -818,6 +819,7 @@ Blockly.Css.CONTENT = [
 
   '.blocklyContextMenu {',
     'border-radius: 4px;',
+    'max-height: 100%;',
   '}',
 
   '.blocklyDropdownMenu {',
