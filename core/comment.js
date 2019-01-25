@@ -27,6 +27,8 @@
 goog.provide('Blockly.Comment');
 
 goog.require('Blockly.Bubble');
+goog.require('Blockly.Events.BlockChange');
+goog.require('Blockly.Events.Ui');
 goog.require('Blockly.Icon');
 goog.require('goog.userAgent');
 
@@ -186,6 +188,7 @@ Blockly.Comment.prototype.setVisible = function(visible) {
     // http://msdn.microsoft.com/en-us/library/hh834675%28v=vs.85%29.aspx
     // Always treat comments in IE as uneditable.
     Blockly.Warning.prototype.setVisible.call(this, visible);
+    Blockly.Hint.prototype.setVisible.call(this, visible);
     return;
   }
   // Save the bubble stats before the visibility switch.
@@ -197,6 +200,8 @@ Blockly.Comment.prototype.setVisible = function(visible) {
         /** @type {!Blockly.WorkspaceSvg} */ (this.block_.workspace),
         this.createEditor_(), this.block_.svgPath_,
         this.iconXY_, this.width_, this.height_);
+    // Expose this comment's block's ID on its top-level SVG group.
+    this.bubble_.setSvgId(this.block_.id);
     this.bubble_.registerResizeEvent(this.resizeBubble_.bind(this));
     this.updateColour();
   } else {
@@ -218,8 +223,9 @@ Blockly.Comment.prototype.setVisible = function(visible) {
  */
 Blockly.Comment.prototype.textareaFocus_ = function(_e) {
   // Ideally this would be hooked to the focus event for the comment.
-  // However doing so in Firefox swallows the cursor for unknown reasons.
-  // So this is hooked to mouseup instead.  No big deal.
+  // This is tied to mousedown, however doing so in Firefox swallows the cursor
+  // for unknown reasons.
+  // See https://github.com/LLK/scratch-blocks/issues/1631 for more history.
   if (this.bubble_.promote_()) {
     // Since the act of moving this node within the DOM causes a loss of focus,
     // we need to reapply the focus.

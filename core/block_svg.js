@@ -29,6 +29,8 @@ goog.provide('Blockly.BlockSvg');
 goog.require('Blockly.Block');
 goog.require('Blockly.BlockAnimations');
 goog.require('Blockly.ContextMenu');
+goog.require('Blockly.Events.Ui');
+goog.require('Blockly.Events.BlockMove');
 goog.require('Blockly.Grid');
 goog.require('Blockly.RenderedConnection');
 goog.require('Blockly.scratchBlocksUtils');
@@ -40,7 +42,6 @@ goog.require('goog.Timer');
 goog.require('goog.asserts');
 goog.require('goog.dom');
 goog.require('goog.math.Coordinate');
-goog.require('goog.userAgent');
 
 
 /**
@@ -50,7 +51,8 @@ goog.require('goog.userAgent');
  * @param {?string} prototypeName Name of the language object containing
  *     type-specific functions for this block.
  * @param {string=} opt_id Optional ID.  Use this ID if provided, otherwise
- *     create a new ID.
+ *     create a new ID.  If the ID conflicts with an in-use ID, a new one will
+ *     be generated.
  * @extends {Blockly.Block}
  * @constructor
  */
@@ -81,6 +83,11 @@ Blockly.BlockSvg = function(workspace, prototypeName, opt_id) {
   Blockly.Tooltip.bindMouseEvents(this.svgPath_);
   Blockly.BlockSvg.superClass_.constructor.call(this,
       workspace, prototypeName, opt_id);
+
+  // Expose this block's ID on its top-level SVG group.
+  if (this.svgGroup_.dataset) {
+    this.svgGroup_.dataset.id = this.id;
+  }
 };
 goog.inherits(Blockly.BlockSvg, Blockly.Block);
 
@@ -229,7 +236,8 @@ Blockly.BlockSvg.prototype.setGlowStack = function(isGlowingStack) {
   // Update the applied SVG filter if the property has changed
   var svg = this.getSvgRoot();
   if (this.isGlowingStack_ && !svg.hasAttribute('filter')) {
-    svg.setAttribute('filter', 'url(#blocklyStackGlowFilter)');
+    var stackGlowFilterId = this.workspace.options.stackGlowFilterId || 'blocklyStackGlowFilter';
+    svg.setAttribute('filter', 'url(#' + stackGlowFilterId + ')');
   } else if (!this.isGlowingStack_ && svg.hasAttribute('filter')) {
     svg.removeAttribute('filter');
   }
@@ -254,6 +262,12 @@ Blockly.BlockSvg.prototype.comment = null;
 Blockly.BlockSvg.prototype.warning = null;
 
 /**
+ * Block's hint icon (if any).
+ * @type {Blockly.Hint}
+ */
+Blockly.BlockSvg.prototype.hint = null;
+
+/**
  * Returns a list of mutator, comment, and warning icons.
  * @return {!Array} List of icons.
  */
@@ -267,6 +281,9 @@ Blockly.BlockSvg.prototype.getIcons = function() {
   }
   if (this.warning) {
     icons.push(this.warning);
+  }
+  if (this.hint) {
+    icons.push(this.hint);
   }
   return icons;
 };
@@ -307,12 +324,8 @@ Blockly.BlockSvg.prototype.setParent = function(newParent) {
   // If we are losing a parent, we want to move our DOM element to the
   // root of the workspace.
   else if (oldParent) {
-    // Avoid moving a block up the DOM if it's currently selected/dragging,
-    // so as to avoid taking things off the drag surface.
-    if (Blockly.selected != this) {
-      this.workspace.getCanvas().appendChild(svgRoot);
-      this.translate(oldXY.x, oldXY.y);
-    }
+    this.workspace.getCanvas().appendChild(svgRoot);
+    this.translate(oldXY.x, oldXY.y);
   }
 
 };
@@ -548,7 +561,7 @@ Blockly.BlockSvg.prototype.setCollapsed = function(collapsed) {
   var COLLAPSED_INPUT_NAME = '_TEMP_COLLAPSED_INPUT';
   if (collapsed) {
     var icons = this.getIcons();
-    for (i = 0; i < icons.length; i++) {
+    for (var i = 0; i < icons.length; i++) {
       icons[i].setVisible(false);
     }
     var text = this.toString(Blockly.COLLAPSE_CHARS);
@@ -656,101 +669,6 @@ Blockly.BlockSvg.prototype.showHelp_ = function() {
   }
 };
 
-/**
- * Creates a callback function for a click on the "duplicate" context menu
- * option in Scratch Blocks.  The block is duplicated and attached to the mouse,
- * which acts as though it were pressed and mid-drag.  Clicking the mouse
- * releases the new dragging block.
- * @return {Function} A callback function that duplicates the block and starts a
- *     drag.
- * @private
- */
-Blockly.BlockSvg.prototype.duplicateAndDragCallback_ = function() {
-  var oldBlock = this;
-  return function(e) {
-    // Give the context menu a chance to close.
-    setTimeout(function() {
-      var ws = oldBlock.workspace;
-      var svgRootOld = oldBlock.getSvgRoot();
-      if (!svgRootOld) {
-        throw new Error('oldBlock is not rendered.');
-      }
-
-      // Create the new block by cloning the block in the flyout (via XML).
-      var xml = Blockly.Xml.blockToDom(oldBlock);
-      // The target workspace would normally resize during domToBlock, which
-      // will lead to weird jumps.
-      // Resizing will be enabled when the drag ends.
-      ws.setResizesEnabled(false);
-
-      // Disable events and manually emit events after the block has been
-      // positioned and has had its shadow IDs fixed (Scratch-specific).
-      Blockly.Events.disable();
-      try {
-        // Using domToBlock instead of domToWorkspace means that the new block
-        // will be placed at position (0, 0) in main workspace units.
-        var newBlock = Blockly.Xml.domToBlock(xml, ws);
-
-        // Scratch-specific: Give shadow dom new IDs to prevent duplicating on paste
-        Blockly.scratchBlocksUtils.changeObscuredShadowIds(newBlock);
-
-        var svgRootNew = newBlock.getSvgRoot();
-        if (!svgRootNew) {
-          throw new Error('newBlock is not rendered.');
-        }
-
-        // The position of the old block in workspace coordinates.
-        var oldBlockPosWs = oldBlock.getRelativeToSurfaceXY();
-
-        // Place the new block as the same position as the old block.
-        // TODO: Offset by the difference between the mouse position and the upper
-        // left corner of the block.
-        newBlock.moveBy(oldBlockPosWs.x, oldBlockPosWs.y);
-      } finally {
-        Blockly.Events.enable();
-      }
-      if (Blockly.Events.isEnabled()) {
-        Blockly.Events.fire(new Blockly.Events.BlockCreate(newBlock));
-      }
-
-      // The position of the old block in pixels relative to the main
-      // workspace's origin.
-      var oldBlockPosPixels = oldBlockPosWs.scale(ws.scale);
-
-      // The offset in pixels between the main workspace's origin and the upper left
-      // corner of the injection div.
-      var mainOffsetPixels = ws.getOriginOffsetInPixels();
-
-      // The position of the old block in pixels relative to the upper left corner
-      // of the injection div.
-      var finalOffsetPixels = goog.math.Coordinate.sum(mainOffsetPixels,
-          oldBlockPosPixels);
-
-      var injectionDiv = ws.getInjectionDiv();
-      // Bounding rect coordinates are in client coordinates, meaning that they
-      // are in pixels relative to the upper left corner of the visible browser
-      // window.  These coordinates change when you scroll the browser window.
-      var boundingRect = injectionDiv.getBoundingClientRect();
-
-      // e is not a real mouseEvent/touchEvent/pointerEvent.  It's an event
-      // created by the context menu and doesn't have the correct coordinates.
-      // But it does have some information that we need.
-      var fakeEvent = {
-        clientX: finalOffsetPixels.x + boundingRect.left,
-        clientY: finalOffsetPixels.y + boundingRect.top,
-        type: 'mousedown',
-        preventDefault: function() {
-          e.preventDefault();
-        },
-        stopPropagation: function() {
-          e.stopPropagation();
-        },
-        target: e.target
-      };
-      ws.startDragWithFakeEvent(fakeEvent, newBlock);
-    }, 0);
-  };
-};
 
 /**
  * Show the context menu for this block.
@@ -765,8 +683,10 @@ Blockly.BlockSvg.prototype.showContextMenu_ = function(e) {
   var block = this;
   var menuOptions = [];
 
+  var isMouseEvent = Blockly.Touch.getTouchIdentifierFromEvent(e) == 'mouse';
   if (this.isDeletable() && this.isMovable() && !block.isInFlyout) {
-    menuOptions.push(Blockly.ContextMenu.blockDuplicateOption(block));
+    menuOptions.push(
+        Blockly.ContextMenu.blockDuplicateOption(block, isMouseEvent));
     if (this.isEditable() && this.workspace.options.comments) {
       menuOptions.push(Blockly.ContextMenu.blockCommentOption(block));
     }
@@ -977,15 +897,22 @@ Blockly.BlockSvg.prototype.getCommentText = function() {
 /**
  * Set this block's comment text.
  * @param {?string} text The text, or null to delete.
+ * @param {string=} commentId Id of the comment, or a new one will be generated if not provided.
+ * @param {number=} commentX Optional x position for scratch comment in workspace coordinates
+ * @param {number=} commentY Optional y position for scratch comment in workspace coordinates
+ * @param {boolean=} minimized Optional minimized state for scratch comment, defaults to false
  */
-Blockly.BlockSvg.prototype.setCommentText = function(text) {
+Blockly.BlockSvg.prototype.setCommentText = function(text, commentId,
+    commentX, commentY, minimized) {
   var changedState = false;
   if (goog.isString(text)) {
     if (!this.comment) {
-      this.comment = new Blockly.Comment(this);
+      this.comment = new Blockly.ScratchBlockComment(this, text, commentId,
+          commentX, commentY, minimized);
       changedState = true;
+    } else {
+      this.comment.setText(/** @type {string} */ (text));
     }
-    this.comment.setText(/** @type {string} */ (text));
   } else {
     if (this.comment) {
       this.comment.dispose();
@@ -994,6 +921,9 @@ Blockly.BlockSvg.prototype.setCommentText = function(text) {
   }
   if (changedState && this.rendered) {
     this.render();
+    if (goog.isString(text)) {
+      this.comment.setVisible(true);
+    }
     // Adding or removing a comment icon will cause the block to change shape.
     this.bumpNeighbours_();
   }
@@ -1064,6 +994,76 @@ Blockly.BlockSvg.prototype.setWarningText = function(text, opt_id) {
   if (changedState && this.rendered) {
     this.render();
     // Adding or removing a warning icon will cause the block to change shape.
+    this.bumpNeighbours_();
+  }
+};
+
+
+/**
+ * Set this block's hint text.
+ * @param {?string} text The text, or null to delete.
+ * @param {string=} opt_id An optional ID for the hint text to be able to
+ *     maintain multiple hints.
+ */
+Blockly.BlockSvg.prototype.setHintText = function(text, opt_id) {
+  if (!this.setHintText.pid_) {
+    // Create a database of hint PIDs.
+    // Only runs once per block (and only those with hints).
+    this.setHintText.pid_ = Object.create(null);
+  }
+  var id = opt_id || '';
+  if (!id) {
+    // Kill all previous pending processes, this edit supersedes them all.
+    for (var n in this.setHintText.pid_) {
+      clearTimeout(this.setHintText.pid_[n]);
+      delete this.setHintText.pid_[n];
+    }
+  } else if (this.setHintText.pid_[id]) {
+    // Only queue up the latest change.  Kill any earlier pending process.
+    clearTimeout(this.setHintText.pid_[id]);
+    delete this.setHintText.pid_[id];
+  }
+  if (this.workspace.isDragging()) {
+    // Don't change the hint text during a drag.
+    // Wait until the drag finishes.
+    var thisBlock = this;
+    this.setHintText.pid_[id] = setTimeout(function() {
+      if (thisBlock.workspace) {  // Check block wasn't deleted.
+        delete thisBlock.setHintText.pid_[id];
+        thisBlock.setHintText(text, id);
+      }
+    }, 100);
+    return;
+  }
+  if (this.isInFlyout) {
+    text = null;
+  }
+
+  var changedState = false;
+  if (goog.isString(text)) {
+    if (!this.hint) {
+      this.hint = new Blockly.Hint(this);
+      changedState = true;
+    }
+    this.hint.setText(/** @type {string} */ (text), id);
+  } else {
+    // Dispose all hints if no ID is given.
+    if (this.hint && !id) {
+      this.hint.dispose();
+      changedState = true;
+    } else if (this.hint) {
+      var oldText = this.hint.getText();
+      this.hint.setText('', id);
+      var newText = this.hint.getText();
+      if (!newText) {
+        this.hint.dispose();
+      }
+      changedState = oldText != newText;
+    }
+  }
+  if (changedState && this.rendered) {
+    this.render();
+    // Adding or removing a hint icon will cause the block to change shape.
     this.bumpNeighbours_();
   }
 };
@@ -1392,43 +1392,4 @@ Blockly.BlockSvg.prototype.scheduleSnapAndBump = function() {
     block.bumpNeighbours_();
     Blockly.Events.setGroup(false);
   }, Blockly.BUMP_DELAY);
-};
-
-/**
- * Determine if this block can be recycled, basic non-dynamic shadows and no variables
- * @return {boolean} true if the block can be recycled
- */
-Blockly.BlockSvg.prototype.isRecyclable = function() {
-
-  // If the block needs to parse mutations, it's probably safest to never recycle.
-  if (this.mutationToDom && this.domToMutation) {
-    return false;
-  }
-
-  for (var i = 0; i < this.inputList.length; i++) {
-    var input = this.inputList[i];
-    for (var j = 0; j < input.fieldRow.length; j++) {
-      var field = input.fieldRow[j];
-      // No variables.
-      if (field instanceof Blockly.FieldVariable ||
-          field instanceof Blockly.FieldVariableGetter) {
-        return false;
-      }
-      if (field instanceof Blockly.FieldDropdown ||
-          field instanceof Blockly.FieldNumberDropdown ||
-          field instanceof Blockly.FieldTextDropdown) {
-        if (field.isOptionListDynamic()) {
-          return false;
-        }
-      }
-    }
-    // Check children.
-    if (input.connection) {
-      var child = input.connection.targetBlock();
-      if (child && !child.isRecyclable()) {
-        return false;
-      }
-    }
-  }
-  return true;
 };

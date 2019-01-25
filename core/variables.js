@@ -45,6 +45,15 @@ goog.require('goog.string');
 Blockly.Variables.NAME_TYPE = Blockly.VARIABLE_CATEGORY_NAME;
 
 /**
+ * Constant prefix to differentiate cloud variable names from other types
+ * of variables.
+ * This is the \u2601 cloud unicode character followed by a space.
+ * @type {string}
+ * @package
+ */
+Blockly.Variables.CLOUD_PREFIX = '☁ ';
+
+/**
  * Find all user-created variables that are in use in the workspace.
  * For use by generators.
  * @param {!Blockly.Block|!Blockly.Workspace} root Root block or workspace.
@@ -54,7 +63,7 @@ Blockly.Variables.allUsedVariables = function(root) {
   var blocks;
   if (root instanceof Blockly.Block) {
     // Root is Block.
-    blocks = root.getDescendants();
+    blocks = root.getDescendants(false);
   } else if (root instanceof Blockly.Workspace ||
       root instanceof Blockly.WorkspaceSvg) {
     // Root is Workspace.
@@ -289,8 +298,17 @@ Blockly.Variables.createVariable = function(workspace, opt_callback, opt_type) {
 
   // Prompt the user to enter a name for the variable
   Blockly.prompt(newMsg, '',
-      function(text) {
-        var validatedText = validate(text, workspace, opt_callback);
+      function(text, additionalVars, variableOptions) {
+        variableOptions = variableOptions || {};
+        var scope = variableOptions.scope;
+        var isLocal = (scope === 'local') || false;
+        var isCloud = variableOptions.isCloud || false;
+        // Default to [] if additionalVars is not provided
+        additionalVars = additionalVars || [];
+        // Only use additionalVars for global variable creation.
+        var additionalVarNames = isLocal ? [] : additionalVars;
+
+        var validatedText = validate(text, workspace, additionalVarNames, isCloud, opt_callback);
         if (validatedText) {
           // The name is valid according to the type, create the variable
           var potentialVarMap = workspace.getPotentialVariableMap();
@@ -305,7 +323,7 @@ Blockly.Variables.createVariable = function(workspace, opt_callback, opt_type) {
                 opt_type, workspace, false);
           }
           if (!variable) {
-            variable = workspace.createVariable(validatedText, opt_type);
+            variable = workspace.createVariable(validatedText, opt_type, null, isLocal, isCloud);
           }
 
           var flyout = workspace.isFlyout ? workspace : workspace.getFlyout();
@@ -338,6 +356,9 @@ Blockly.Variables.createVariable = function(workspace, opt_callback, opt_type) {
  * @param {!Blockly.Workspace} workspace The workspace on which to validate the
  *     variable name. This is the workspace used to check whether the variable
  *     already exists.
+ * @param {Array<string>} additionalVars A list of additional var names to check
+ *     for conflicts against.
+ * @param {boolean} isCloud Whether the variable is a cloud variable.
  * @param {function(?string=)=} opt_callback An optional function to be called on
  *     a pre-existing variable of the user-provided name. This function is currently
  *     only used for broadcast messages.
@@ -347,7 +368,8 @@ Blockly.Variables.createVariable = function(workspace, opt_callback, opt_type) {
  *     proceed with creating or renaming the variable.
  * @private
  */
-Blockly.Variables.nameValidator_ = function(type, text, workspace, opt_callback) {
+Blockly.Variables.nameValidator_ = function(type, text, workspace, additionalVars,
+    isCloud, opt_callback) {
   // The validators for the different variable types require slightly different arguments.
   // For broadcast messages, if a broadcast message of the provided name already exists,
   // the validator needs to call a function that updates the selected
@@ -359,10 +381,10 @@ Blockly.Variables.nameValidator_ = function(type, text, workspace, opt_callback)
   if (type == Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE) {
     return Blockly.Variables.validateBroadcastMessageName_(text, workspace, opt_callback);
   } else if (type == Blockly.LIST_VARIABLE_TYPE) {
-    return Blockly.Variables.validateScalarVarOrListName_(text, workspace, type,
+    return Blockly.Variables.validateScalarVarOrListName_(text, workspace, additionalVars, false, type,
         Blockly.Msg.LIST_ALREADY_EXISTS);
   } else {
-    return Blockly.Variables.validateScalarVarOrListName_(text, workspace, type,
+    return Blockly.Variables.validateScalarVarOrListName_(text, workspace, additionalVars, isCloud, type,
         Blockly.Msg.VARIABLE_ALREADY_EXISTS);
   }
 };
@@ -407,6 +429,9 @@ Blockly.Variables.validateBroadcastMessageName_ = function(name, workspace, opt_
  * @param {string} name The name to validate
  * @param {!Blockly.Workspace} workspace The workspace the name should be validated
  *     against.
+ * @param {Array<string>} additionalVars A list of additional variable names to check
+ *     for conflicts against.
+ * @param {boolean} isCloud Whether the variable is a cloud variable.
  * @param {string} type The type to validate the variable as. This should be one of
  *     Blockly.SCALAR_VARIABLE_TYPE or Blockly.LIST_VARIABLE_TYPE.
  * @param {string} errorMsg The type-specific error message the user should see
@@ -414,14 +439,17 @@ Blockly.Variables.validateBroadcastMessageName_ = function(name, workspace, opt_
  * @return {string} The validated name, or null if invalid.
  * @private
  */
-Blockly.Variables.validateScalarVarOrListName_ = function(name, workspace,
-    type, errorMsg) {
+Blockly.Variables.validateScalarVarOrListName_ = function(name, workspace, additionalVars,
+    isCloud, type, errorMsg) {
   // For scalar variables, we don't want leading or trailing white space
   name = Blockly.Variables.trimName_(name);
   if (!name) {
     return null;
   }
-  if (workspace.getVariable(name, type)) {
+  if (isCloud) {
+    name = Blockly.Variables.CLOUD_PREFIX + name;
+  }
+  if (workspace.getVariable(name, type) || additionalVars.indexOf(name) >= 0) {
     // error
     Blockly.alert(errorMsg.replace('%1', name));
     return null;
@@ -460,9 +488,21 @@ Blockly.Variables.renameVariable = function(workspace, variable,
   var validate = Blockly.Variables.nameValidator_.bind(null, varType);
 
   var promptText = promptMsg.replace('%1', variable.name);
-  Blockly.prompt(promptText, '',
-      function(newName) {
-        var validatedText = validate(newName, workspace);
+  var promptDefaultText = variable.name;
+  if (variable.isCloud && variable.name.indexOf(Blockly.Variables.CLOUD_PREFIX) == 0) {
+    promptDefaultText = promptDefaultText.substring(Blockly.Variables.CLOUD_PREFIX.length);
+  }
+
+  Blockly.prompt(promptText, promptDefaultText,
+      function(newName, additionalVars) {
+        if (variable.isCloud &&
+            newName.length > 0 && newName.indexOf(Blockly.Variables.CLOUD_PREFIX) == 0) {
+          newName = newName.substring(Blockly.Variables.CLOUD_PREFIX.length);
+          // The name validator will add the prefix back
+        }
+        additionalVars = additionalVars || [];
+        var additionalVarNames = variable.isLocal ? [] : additionalVars;
+        var validatedText = validate(newName, workspace, additionalVarNames, variable.isCloud);
         if (validatedText) {
           workspace.renameVariableById(variable.getId(), validatedText);
           if (opt_callback) {

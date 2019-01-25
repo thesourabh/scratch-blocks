@@ -55,7 +55,7 @@ Blockly.Blocks['motion_turnright'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_TURNLEFT,
+      "message0": Blockly.Msg.MOTION_TURNRIGHT,
       "args0": [
         {
           "type": "field_image",
@@ -81,7 +81,7 @@ Blockly.Blocks['motion_turnleft'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": Blockly.Msg.MOTION_TURNRIGHT,
+      "message0": Blockly.Msg.MOTION_TURNLEFT,
       "args0": [
         {
           "type": "field_image",
@@ -133,7 +133,8 @@ Blockly.Blocks['motion_pointtowards_menu'] = {
           "type": "field_dropdown",
           "name": "TOWARDS",
           "options": [
-            [Blockly.Msg.MOTION_POINTTOWARDS_POINTER, '_mouse_']
+            [Blockly.Msg.MOTION_POINTTOWARDS_POINTER, '_mouse_'],
+            [Blockly.Msg.MOTION_POINTTOWARDS_RANDOM, '_random_']
           ]
         }
       ],
