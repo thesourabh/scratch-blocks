@@ -145,6 +145,7 @@ Blockly.Hint.prototype.setVisible = function(visible) {
         content, this.block_.svgPath_, this.iconXY_, null, null);
     // specific for hint
     this.bubble_.registerContextMenuCallback(this.showContextMenu_.bind(this));
+    this.bubble_.registerMouseOverCallback(this.showCodeHint_.bind(this));
 
     if (this.block_.RTL) {
       // Right-align the paragraph.
@@ -181,6 +182,12 @@ Blockly.Hint.prototype.showContextMenu_ = function(e) {
   Blockly.ContextMenu.show(e, menuOptions, this.block_.RTL);
 };
 
+Blockly.Hint.prototype.showCodeHint_ = function(e) {
+  var event = new Blockly.Events.HintClick(this,"mouseover");
+      event.workspaceId = this.block_.workspace.id;
+      Blockly.Events.fire(event);
+}
+
 /**
  * Make a context menu option for action resolving the hint
  * @param {!Blockly.Hint} hint The hint where the
@@ -195,7 +202,7 @@ Blockly.Hint.hintImproveOption = function(hint) {
     enabled: true,
     callback: function() {
       console.log("Hint callback to improve get invoked");
-      var event = new Blockly.Events.HintClick(hint);
+      var event = new Blockly.Events.HintClick(hint, "improve_option_click");
       event.workspaceId = wsId;
       Blockly.Events.fire(event);
     }
