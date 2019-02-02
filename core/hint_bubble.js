@@ -73,6 +73,7 @@ Blockly.HintBubble = function(workspace, content, shape, anchorXY,
   this.rendered_ = true;
 
   if (!workspace.options.readOnly) {
+    Blockly.bindEvent_(this.content_, 'mouseover', this, this.bubbleMouseOver_);
     Blockly.bindEventWithChecks_(
         this.content_, 'mousedown', this, this.bubbleMouseDown_);
   }
@@ -85,6 +86,10 @@ Blockly.HintBubble = function(workspace, content, shape, anchorXY,
  */
 Blockly.HintBubble.prototype.registerContextMenuCallback = function(callback) {
   this.contextMenuCallback_ = callback;
+};
+
+Blockly.HintBubble.prototype.registerMouseOverCallback = function(callback) {
+  this.mouseoverCallback_ = callback;
 };
 
 /**
@@ -280,6 +285,12 @@ Blockly.HintBubble.prototype.showContextMenu_ = function(_e) {
     this.contextMenuCallback_(_e);
   }
 };
+
+Blockly.HintBubble.prototype.bubbleMouseOver_ = function(_e){
+  if(this.mouseoverCallback_){
+    this.mouseoverCallback_(_e);
+  }
+}
 
 /**
  * Get whether this bubble is deletable or not.

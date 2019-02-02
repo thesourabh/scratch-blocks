@@ -538,13 +538,14 @@ Blockly.Events.Move.prototype.run = function(forward) {
  * @extends {Blockly.Events.BlockBase}
  * @constructor
  */
-Blockly.Events.HintClick = function(hint) {
+Blockly.Events.HintClick = function(hint, interactionType) {
   if (!hint) {
     return;  // Blank event to be populated by fromJson.
   }
   Blockly.Events.HintClick.superClass_.constructor.call(this);
   this.hintId = hint.getText();
   this.recordUndo = false;
+  this.interactionType = interactionType;
 };
 goog.inherits(Blockly.Events.HintClick, Blockly.Events.Abstract);
 
