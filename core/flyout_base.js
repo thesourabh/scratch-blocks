@@ -146,6 +146,14 @@ Blockly.Flyout = function(workspaceOptions) {
    */
   this.recycleBlocks_ = [];
 
+  /**
+   * List of current highlight boxes drawn in flyout.  Highlight boxes are often used to
+   * visually mark certain group of variables.
+   * @type !Array.<!Blockly.BlockSvg>
+   * @private
+   */
+  this.highlightBoxs_ = [];
+
 };
 
 /**
@@ -920,4 +928,40 @@ Blockly.Flyout.prototype.recycleBlock_ = function(block) {
   var xy = block.getRelativeToSurfaceXY();
   block.moveBy(-xy.x, -xy.y);
   this.recycleBlocks_.push(block);
+};
+
+/**
+ * Display highlighting box for given variables in the workspace.
+ * @param {array} ids IDs of variables to find.
+ */
+Blockly.Flyout.prototype.drawHighlightBox = function(ids) {
+  for ( var i=0; i< ids.length; i++ ) {
+    var id = ids[i];
+    var block = null;
+    var height = 0;
+    if (id) {
+      block = this.workspace_.getBlockById(id);
+      if (!block) {
+        throw 'Tried to highlight variable that does not exist.';
+      }
+    }
+    height = block.getHeightWidth().height;
+    this.highlightBoxs_.push(Blockly.utils.createSvgElement('rect',
+      {'height': height * this.workspace_.scale,
+      'width' : (block.getHeightWidth().width+10) * this.workspace_.scale,
+      'style' : "fill: none;stroke-width:5;stroke:rgb(255,0,0);",
+      'x' : (block.getBoundingRectangle().topLeft.x-5) * this.workspace_.scale,
+      'y' : (block.getBoundingRectangle().topLeft.y-this.getScrollPos()) * this.workspace_.scale
+      },
+      this.svgGroup_));
+  }
+};
+
+/**
+ * Remove all highlighting boxes for given variables in the workspace.
+ */
+Blockly.Flyout.prototype.removeHighlightBox = function() {
+  for ( var i=0; i<this.highlightBoxs_.length; i++ ) {
+    this.highlightBoxs_[i].remove();
+  }
 };
