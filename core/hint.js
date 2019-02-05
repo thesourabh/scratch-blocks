@@ -146,6 +146,7 @@ Blockly.Hint.prototype.setVisible = function(visible) {
     // specific for hint
     this.bubble_.registerContextMenuCallback(this.showContextMenu_.bind(this));
     this.bubble_.registerMouseOverCallback(this.showCodeHint_.bind(this));
+    this.bubble_.registerMouseOutCallback(this.hideCodeHint_.bind(this));
 
     if (this.block_.RTL) {
       // Right-align the paragraph.
@@ -186,7 +187,16 @@ Blockly.Hint.prototype.showCodeHint_ = function(e) {
   var event = new Blockly.Events.HintClick(this,"mouseover");
       event.workspaceId = this.block_.workspace.id;
       Blockly.Events.fire(event);
-}
+  // this.block_.workspace.highlightBlock(this.block_.id, true);
+
+};
+Blockly.Hint.prototype.hideCodeHint_ = function(e) {
+  var event = new Blockly.Events.HintClick(this,"mouseout");
+      event.workspaceId = this.block_.workspace.id;
+      Blockly.Events.fire(event);
+  // this.block_.workspace.highlightBlock(this.block_.id, false);
+
+};
 
 /**
  * Make a context menu option for action resolving the hint

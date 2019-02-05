@@ -74,6 +74,7 @@ Blockly.HintBubble = function(workspace, content, shape, anchorXY,
 
   if (!workspace.options.readOnly) {
     Blockly.bindEvent_(this.content_, 'mouseover', this, this.bubbleMouseOver_);
+    Blockly.bindEvent_(this.content_, 'mouseout', this, this.bubbleMouseOut_);
     Blockly.bindEventWithChecks_(
         this.content_, 'mousedown', this, this.bubbleMouseDown_);
   }
@@ -90,6 +91,10 @@ Blockly.HintBubble.prototype.registerContextMenuCallback = function(callback) {
 
 Blockly.HintBubble.prototype.registerMouseOverCallback = function(callback) {
   this.mouseoverCallback_ = callback;
+};
+
+Blockly.HintBubble.prototype.registerMouseOutCallback = function(callback) {
+  this.mouseoutCallback_ = callback;
 };
 
 /**
@@ -232,7 +237,7 @@ Blockly.HintBubble.prototype.createDom_ = function(content, hasResize) {
   */
   this.bubbleGroup_ = Blockly.utils.createSvgElement('g', {}, null);
   this.resizeGroup_ = null;
-  
+
   this.bubbleGroup_.appendChild(content);
   return this.bubbleGroup_;
 };
@@ -290,7 +295,13 @@ Blockly.HintBubble.prototype.bubbleMouseOver_ = function(_e){
   if(this.mouseoverCallback_){
     this.mouseoverCallback_(_e);
   }
-}
+};
+
+Blockly.HintBubble.prototype.bubbleMouseOut_ = function(_e){
+  if(this.mouseoutCallback_){
+    this.mouseoutCallback_(_e);
+  }
+};
 
 /**
  * Get whether this bubble is deletable or not.
