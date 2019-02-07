@@ -222,9 +222,34 @@ Blockly.BlockSvg.prototype.unselect = function() {
  * Glow only this particular block, to highlight it visually as if it's running.
  * @param {boolean} isGlowingBlock Whether the block should glow.
  */
-Blockly.BlockSvg.prototype.setGlowBlock = function(isGlowingBlock) {
+Blockly.BlockSvg.prototype.setGlowBlock = function(isGlowingBlock, refactor=false) {
   this.isGlowingBlock_ = isGlowingBlock;
-  this.updateColour();
+  
+  if( refactor === false ){
+    this.updateColour();
+  }
+  else{
+    // Update the applied SVG filter if the property has changed
+    var svg = this.getSvgRoot();
+    if (this.isGlowingBlock_ && !svg.hasAttribute('filter')) {
+      svg.setAttribute('filter', 'url(#blocklyMessyBlockGlowFilter)');
+    } else if (!this.isGlowingBlock_ && svg.hasAttribute('filter')) {
+      svg.removeAttribute('filter');
+    }
+  }
+}
+
+/**
+ * Set whether the block is highlighted or not.
+ * @param {boolean} highlighted True if highlighted.
+ */
+Blockly.BlockSvg.prototype.setHighlighted = function(highlighted) {
+  var svg = this.getSvgRoot();
+  if (highlighted && !svg.hasAttribute('filter')) {
+    svg.setAttribute('filter', 'url(#blocklyMessyBlockGlowFilter)');
+  } else if (svg.hasAttribute('filter')) {
+    svg.removeAttribute('filter');
+  }
 };
 
 /**
@@ -390,6 +415,35 @@ Blockly.BlockSvg.prototype.moveBy = function(dx, dy) {
   }
   this.workspace.resizeContents();
 };
+
+/**
+ * Move a block along with its connected blocks and attach it to given parent
+ * @param {Blockly.BlockSvg} parent 
+ */
+Blockly.BlockSvg.prototype.attachToParent = function(parent) {
+  goog.asserts.assert(parent, 'Parent not provided');
+  this.parentBlock_=null;
+  this.workspace.addTopBlock(this);
+  this.setParent(parent);
+};
+
+
+/**
+ * Connect block to given block 
+ * Note: any block below this block will be disconnected
+ * @param {Blockly.BlockSvg} block
+ */
+Blockly.BlockSvg.prototype.connectToBlock = function(block) {
+  var previousConn = this.nextConnection;
+  if(previousConn.targetConnection) previousConn.disconnect();
+  var nextConn = block.previousConnection;
+  if(nextConn && nextConn.targetConnection) nextConn.disconnect();
+  if (previousConn.checkType_(nextConn)) {
+    // Attach the given block to this block.
+    previousConn.connect(nextConn);
+  }
+};
+
 
 /**
  * Transforms a block by setting the translation on the transform attribute

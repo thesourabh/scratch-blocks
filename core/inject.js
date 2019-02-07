@@ -177,6 +177,46 @@ Blockly.createDom_ = function(container, options) {
       },
       stackGlowFilter);
 
+  //  copy of stackGlowFilter with different color
+
+  var messyBlockGlowFilter = Blockly.utils.createSvgElement('filter',
+    {'id': 'blocklyMessyBlockGlowFilter',
+      'height': '160%', 
+      'width': '180%', 
+      y: '-30%', 
+      x: '-40%'
+    }, 
+    defs);
+
+  options.refactorGlowBlur = Blockly.utils.createSvgElement('feGaussianBlur',
+    {'in': 'SourceGraphic',
+      'stdDeviation': Blockly.Colours.stackGlowSize}, 
+      messyBlockGlowFilter);
+  // Set all gaussian blur pixels to 1 opacity before applying flood
+  var componentTransfer2 = Blockly.utils.createSvgElement('feComponentTransfer', {'result': 'outBlur'}, messyBlockGlowFilter);
+  Blockly.utils.createSvgElement('feFuncA',
+    {'type': 'table', 
+    'tableValues': '0' + goog.string.repeat(' 1', 16)}, 
+    componentTransfer2);
+  // Color the highlight
+  Blockly.utils.createSvgElement('feFlood',
+    {'flood-color': Blockly.Colours.messyBlockGlow,
+      'flood-opacity': Blockly.Colours.stackGlowOpacity, 
+      'result': 'outColor'}, 
+      messyBlockGlowFilter);
+  Blockly.utils.createSvgElement('feComposite',
+    {'in': 'outColor', 
+      'in2': 'outBlur',
+      'operator': 'in', 
+      'result': 'outGlow'}, 
+      messyBlockGlowFilter);
+  Blockly.utils.createSvgElement('feComposite',
+    {'in': 'SourceGraphic', 'in2': 'outGlow', 'operator': 'over'}, messyBlockGlowFilter);
+
+
+  // copy ends
+
+
   // Filter for replacement marker
   var replacementGlowFilter = Blockly.utils.createSvgElement('filter',
       {
