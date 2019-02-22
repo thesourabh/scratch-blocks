@@ -129,7 +129,7 @@ Blockly.Hint.prototype.setBubbleSize = function(width, height) {
  * Show or hide the hint bubble.
  * @param {boolean} visible True if the bubble should be visible.
  */
-Blockly.Hint.prototype.setVisible = function(visible) {
+Blockly.Hint.prototype.setVisible = function(visible, hintType) {
   if (visible == this.isVisible()) {
     // No change.
     return;
@@ -144,9 +144,13 @@ Blockly.Hint.prototype.setVisible = function(visible) {
         /** @type {!Blockly.WorkspaceSvg} */ (this.block_.workspace),
         content, this.block_.svgPath_, this.iconXY_, null, null);
     // specific for hint
-    this.bubble_.registerContextMenuCallback(this.showContextMenu_.bind(this));
-    this.bubble_.registerMouseOverCallback(this.showCodeHint_.bind(this));
-    this.bubble_.registerMouseOutCallback(this.hideCodeHint_.bind(this));
+    if (hintType === "edit_procedure") {
+      this.bubble_.registerContextMenuCallback(this.showEditContextMenu_.bind(this));
+    } else {
+      this.bubble_.registerContextMenuCallback(this.showContextMenu_.bind(this));
+      this.bubble_.registerMouseOverCallback(this.showCodeHint_.bind(this));
+      this.bubble_.registerMouseOutCallback(this.hideCodeHint_.bind(this));
+    }
 
     if (this.block_.RTL) {
       // Right-align the paragraph.
@@ -167,6 +171,26 @@ Blockly.Hint.prototype.setVisible = function(visible) {
     this.bubble_ = null;
     this.body_ = null;
   }
+};
+
+/**
+ * Show the context menu for this comment's bubble.
+ * @param {!Event} e The mouse event
+ * @private
+ */
+Blockly.Hint.prototype.showEditContextMenu_ = function(e) {
+  var menuOptions = [];
+  var block = this.block_;
+  var _this = this;
+  menuOptions.push({
+    enabled: true,
+    text: Blockly.Msg.EDIT_PROCEDURE,
+    callback: function() {
+      Blockly.Procedures.editProcedureCallback_(block);
+      _this.setVisible(false, "edit_procedure");
+    }
+  });
+  Blockly.ContextMenu.show(e, menuOptions, block.RTL);
 };
 
 /**
