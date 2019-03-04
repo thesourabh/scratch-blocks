@@ -82,13 +82,6 @@ Blockly.FieldNumber.fromJson = function(options) {
 Blockly.FieldNumber.DROPDOWN_WIDTH = 168;
 
 /**
- * Extra padding to add between the block and the num-pad drop-down, in px.
- * @type {number}
- * @const
- */
-Blockly.FieldNumber.DROPDOWN_Y_PADDING = 8;
-
-/**
  * Buttons for the num-pad, in order from the top left.
  * Values are strings of the number or symbol will be added to the field text
  * when the button is pressed.
@@ -197,8 +190,8 @@ Blockly.FieldNumber.prototype.showNumPad_ = function() {
   this.addButtons_(contentDiv);
 
   // Set colour and size of drop-down
-  Blockly.DropDownDiv.setColour(Blockly.Colours.numPadBackground,
-      Blockly.Colours.numPadBorder);
+  Blockly.DropDownDiv.setColour(this.sourceBlock_.parentBlock_.getColour(),
+      this.sourceBlock_.getColourTertiary());
   contentDiv.style.width = Blockly.FieldNumber.DROPDOWN_WIDTH + 'px';
 
   this.position_();
@@ -218,12 +211,10 @@ Blockly.FieldNumber.prototype.position_ = function() {
   var position = this.getAbsoluteXY_();
   // If we can fit it, render below the shadow block
   var primaryX = position.x + bBox.width / 2;
-  var primaryY = position.y + bBox.height +
-      Blockly.FieldNumber.DROPDOWN_Y_PADDING;
+  var primaryY = position.y + bBox.height;
   // If we can't fit it, render above the entire parent block
   var secondaryX = primaryX;
-  var secondaryY = position.y - (Blockly.BlockSvg.MIN_BLOCK_Y * scale) -
-      (Blockly.BlockSvg.FIELD_Y_OFFSET * scale);
+  var secondaryY = position.y;
 
   Blockly.DropDownDiv.setBoundsElement(
       this.sourceBlock_.workspace.getParentSvg().parentNode);
@@ -238,12 +229,18 @@ Blockly.FieldNumber.prototype.position_ = function() {
  * @private
  */
 Blockly.FieldNumber.prototype.addButtons_ = function(contentDiv) {
+  var buttonColour = this.sourceBlock_.parentBlock_.getColour();
+  var buttonBorderColour = this.sourceBlock_.parentBlock_.getColourTertiary();
+
   // Add numeric keypad buttons
   var buttons = Blockly.FieldNumber.NUMPAD_BUTTONS;
   for (var i = 0, buttonText; buttonText = buttons[i]; i++) {
     var button = document.createElement('button');
     button.setAttribute('role', 'menuitem');
     button.setAttribute('class', 'blocklyNumPadButton');
+    button.setAttribute('style',
+        'background:' + buttonColour + ';' +
+        'border: 1px solid ' + buttonBorderColour + ';');
     button.title = buttonText;
     button.innerHTML = buttonText;
     Blockly.bindEvent_(button, 'mousedown', button,
@@ -264,6 +261,9 @@ Blockly.FieldNumber.prototype.addButtons_ = function(contentDiv) {
   var eraseButton = document.createElement('button');
   eraseButton.setAttribute('role', 'menuitem');
   eraseButton.setAttribute('class', 'blocklyNumPadButton');
+  eraseButton.setAttribute('style',
+      'background:' + buttonColour + ';' +
+      'border: 1px solid ' + buttonBorderColour + ';');
   eraseButton.title = 'Delete';
 
   var eraseImage = document.createElement('img');

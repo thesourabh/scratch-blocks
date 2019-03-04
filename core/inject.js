@@ -132,7 +132,7 @@ Blockly.createDom_ = function(container, options) {
   // Instead use a gaussian blur, and then set all alpha to 1 with a transfer.
   var stackGlowFilter = Blockly.utils.createSvgElement('filter',
       {
-        'id': 'blocklyStackGlowFilter',
+        'id': 'blocklyStackGlowFilter' + rnd,
         'height': '160%',
         'width': '180%',
         y: '-30%',
@@ -177,50 +177,10 @@ Blockly.createDom_ = function(container, options) {
       },
       stackGlowFilter);
 
-  //  copy of stackGlowFilter with different color
-
-  var messyBlockGlowFilter = Blockly.utils.createSvgElement('filter',
-    {'id': 'blocklyMessyBlockGlowFilter',
-      'height': '160%', 
-      'width': '180%', 
-      y: '-30%', 
-      x: '-40%'
-    }, 
-    defs);
-
-  options.refactorGlowBlur = Blockly.utils.createSvgElement('feGaussianBlur',
-    {'in': 'SourceGraphic',
-      'stdDeviation': Blockly.Colours.stackGlowSize}, 
-      messyBlockGlowFilter);
-  // Set all gaussian blur pixels to 1 opacity before applying flood
-  var componentTransfer2 = Blockly.utils.createSvgElement('feComponentTransfer', {'result': 'outBlur'}, messyBlockGlowFilter);
-  Blockly.utils.createSvgElement('feFuncA',
-    {'type': 'table', 
-    'tableValues': '0' + goog.string.repeat(' 1', 16)}, 
-    componentTransfer2);
-  // Color the highlight
-  Blockly.utils.createSvgElement('feFlood',
-    {'flood-color': Blockly.Colours.messyBlockGlow,
-      'flood-opacity': Blockly.Colours.stackGlowOpacity, 
-      'result': 'outColor'}, 
-      messyBlockGlowFilter);
-  Blockly.utils.createSvgElement('feComposite',
-    {'in': 'outColor', 
-      'in2': 'outBlur',
-      'operator': 'in', 
-      'result': 'outGlow'}, 
-      messyBlockGlowFilter);
-  Blockly.utils.createSvgElement('feComposite',
-    {'in': 'SourceGraphic', 'in2': 'outGlow', 'operator': 'over'}, messyBlockGlowFilter);
-
-
-  // copy ends
-
-
   // Filter for replacement marker
   var replacementGlowFilter = Blockly.utils.createSvgElement('filter',
       {
-        'id': 'blocklyReplacementGlowFilter',
+        'id': 'blocklyReplacementGlowFilter' + rnd,
         'height': '160%',
         'width': '180%',
         y: '-30%',
@@ -293,6 +253,8 @@ Blockly.createDom_ = function(container, options) {
         'stroke': '#cc0'
       },
       disabledPattern);
+  options.stackGlowFilterId = stackGlowFilter.id;
+  options.replacementGlowFilterId = replacementGlowFilter.id;
   options.disabledPatternId = disabledPattern.id;
 
   options.gridPattern = Blockly.Grid.createDom(rnd, options.gridOptions, defs);
@@ -319,7 +281,7 @@ Blockly.createMainWorkspace_ = function(svg, options, blockDragSurface, workspac
   if (!options.hasCategories && options.languageTree) {
     // Add flyout as an <svg> that is a sibling of the workspace svg.
     var flyout = mainWorkspace.addFlyout_('svg');
-    Blockly.utils.insertAfter_(flyout, svg);
+    Blockly.utils.insertAfter(flyout, svg);
   }
 
   // A null translation will also apply the correct initial scale.
@@ -402,7 +364,7 @@ Blockly.init_ = function(mainWorkspace) {
   var workspaceResizeHandler = Blockly.bindEventWithChecks_(window, 'resize',
       null,
       function() {
-        Blockly.hideChaff(true);
+        Blockly.hideChaffOnResize(true);
         Blockly.svgResize(mainWorkspace);
       });
   mainWorkspace.setResizeHandlerWrapper(workspaceResizeHandler);
