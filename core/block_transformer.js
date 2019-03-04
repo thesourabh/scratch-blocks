@@ -19,19 +19,20 @@ Blockly.BlockTransformer.prototype.doTransform = function (refactorable) {
 };
 
 Blockly.BlockTransformer.prototype.executeAction = function (action) {
+    let result = true;
     try {
-        this.apply(action);
+        result = this.apply(action);
     } catch (err) {
         throw "failed to apply transformation:" +
         JSON.stringify(action)
         + "\n" + err.message;
     }
-    return true;
+    return result;
 };
 
 Blockly.BlockTransformer.prototype.apply = function (action) {
     const actionType = action.type;
-    this[actionType](action);
+    return this[actionType](action);
 };
 
 Blockly.BlockTransformer.prototype.VarDeclareAction = function (action) {
@@ -67,7 +68,11 @@ Blockly.BlockTransformer.prototype.VarRename = function (action) {
 Blockly.BlockTransformer.prototype.BlockCreateAction = function (action) {
     let dom = Blockly.Xml.textToDom(action.block_xml).firstChild;
     let block = Blockly.Xml.domToBlock(dom, this.workspace);
-    return true;
+    if (block.type === "procedures_definition") {
+      return block;
+      // Blockly.Procedures.editProcedureCallback_(block);
+    }
+    return true
 };
 
 Blockly.BlockTransformer.prototype.InsertBlockAction = function (action) {
