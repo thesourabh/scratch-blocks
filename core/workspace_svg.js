@@ -992,35 +992,29 @@ Blockly.WorkspaceSvg.prototype.glowMessyBlock = function(ids, isMessyGlowingBloc
  * @param {?string} (optional) end id ID of block to find.
  */
 Blockly.WorkspaceSvg.prototype.drawHighlightBox = function(id, id2=null) {
-  var block = null;
-  var height = 0;
+  var block1 = null, block2 = null;
   if (id) {
-    block = this.getBlockById(id);
-    if (!block) {
+    block1 = this.getBlockById(id);
+    if (!block1) {
       throw 'Tried to highlight block that does not exist.';
     }
   }
-  var lastBlock = null;
-  var block2 = null;
-  if(id2==null){
-    lastBlock = block.getNextBlock();
-  } else {
+  if (id2) {
     block2 = this.getBlockById(id2);
-    lastBlock = block2.getNextBlock();
+    if (!block2) {
+      throw 'Tried to highlight block that does not exist.';
+    }
   }
-  if(lastBlock==null){
-    height = block.getHeightWidth().height;
-  } else {
-    height = block.getHeightWidth().height-lastBlock.getHeightWidth().height;
-  }
-  this.highlightBoxs_.push(Blockly.utils.createSvgElement('rect',
-    {'height': height,
-    'width' : block.getHeightWidth().width+10,
-    'style' : "fill: none;stroke-width:5;stroke:rgb(255,0,0);",
-    'x' : block.getBoundingRectangle().topLeft.x-5,
-    'y' : block.getBoundingRectangle().topLeft.y
+  this.highlightBoxs_.push(Blockly.utils.createSvgElement('path',
+    {
+      'd': Blockly.utils.getBoundingPath(block1,block2),
+      'class': 'blocklyPath blocklyBlockBackground',
+      'stroke': 'black',
+      'style': 'stroke-width: 5px',
+      'fill-opacity': '0',
+      'fill': 'black'
     },
-    this.svgBlockCanvas_));
+    block1.getSvgRoot()));
 };
 
 /**
