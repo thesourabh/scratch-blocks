@@ -958,3 +958,80 @@ Blockly.utils.startsWith = function(str, prefix) {
 Blockly.utils.toRadians = function(angleDegrees) {
   return angleDegrees * Math.PI / 180;
 };
+
+/**
+ *Returns path string which bounds the blocks between block1 and block2 (inclusive)
+ */
+Blockly.utils.getBoundingPath = function(block1, block2=null){
+  if(block2 == null){
+    return block1.svgPath_.getAttribute("d");
+  }
+  var d = "";
+  var pd1 = block1.svgPath_.getAttribute("d").split(" H");
+  var pd2 = block2.svgPath_.getAttribute("d").split(" H");
+  d = d + pd1[0] + " H" + pd1[1];
+  var block2Type = block2.type.replace("control_","");
+  d = d + Blockly.utils.pathBetween(block1,block2);
+  if(["if","repeat","repeat_until","forever"].includes(block2Type)){
+    var substack = block2.inputList[1].connection ? block2.inputList[1].connection.targetConnection.getSourceBlock() : block2.inputList[2].connection.targetConnection.getSourceBlock();
+    var newTranslate = parseInt(substack.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]);
+    d = d + " H" + pd2[2] + Blockly.utils.pathBetween(substack, null, newTranslate)
+      + " H" + pd2[4];
+    d = d + " H" + pd2[6] + " H" + pd2[7];
+  } else if(block2Type == "if_else"){
+    var substack1 = block2.inputList[2].connection.targetConnection.getSourceBlock();
+    var substack2 = block2.inputList[4].connection.targetConnection.getSourceBlock();
+    var newTranslate1 = parseInt(substack1.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]);
+    var newTranslate2 = parseInt(substack2.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]);
+    d = d + " H" + pd2[2] + Blockly.utils.pathBetween(substack1, null, newTranslate1)
+      + " H" + pd2[5] + Blockly.utils.pathBetween(substack2, null, newTranslate2)
+      + " H" + pd2[7];
+    d = d + " H" + pd2[8] + " H" + pd2[9];
+  } else {
+    d = d + " H" + pd2[2];
+    d = d + " H" + pd2[3] + " H" + pd2[4];
+  }
+  return d;
+};
+
+/**
+ *Returns path string for nested blocks
+ */
+Blockly.utils.pathBetween = function(block1, block2, translate=0){
+  var d = "";
+  var block = block1;
+  while (block != null && block != block2){
+    var pd = block.svgPath_.getAttribute("d").split(" H");
+    pd[2] = pd[2].replace(pd[2].split(" ")[1],parseInt(pd[2].split(" ")[1]) + translate);
+    var blockType = block.type.replace("control_","");
+    if(["repeat","repeat_until","forever"].includes(blockType)){
+      pd[5] = pd[5].replace(pd[5].split(" ")[1],parseInt(pd[5].split(" ")[1]) + translate )
+      var substack = block.inputList[1].connection ? block.inputList[1].connection.targetConnection.getSourceBlock() : block.inputList[2].connection.targetConnection.getSourceBlock();
+      var newTranslate = parseInt(substack.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]) + translate;
+      d = d + " H" + pd[2] + Blockly.utils.pathBetween(substack, null, newTranslate)
+        + " H" + pd[5];
+    } else if(blockType == "if"){
+      pd[4] = pd[4].replace(pd[4].split(" ")[1],parseInt(pd[4].split(" ")[1]) + translate )
+      var substack = block.inputList[1].connection ? block.inputList[1].connection.targetConnection.getSourceBlock() : block.inputList[2].connection.targetConnection.getSourceBlock();
+      var newTranslate = parseInt(substack.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]) + translate;
+      d = d + " H" + pd[2] + Blockly.utils.pathBetween(substack, null, newTranslate)
+        + " H" + pd[4];
+    } else if(blockType == "if_else"){
+      pd[5] = pd[5].replace(pd[5].split(" ")[1],parseInt(pd[5].split(" ")[1]) + translate )
+      pd[7] = pd[7].replace(pd[7].split(" ")[1],parseInt(pd[7].split(" ")[1]) + translate )
+      var substack1 = block.inputList[2].connection.targetConnection.getSourceBlock();
+      var substack2 = block.inputList[4].connection.targetConnection.getSourceBlock();
+      var newTranslate1 = parseInt(substack1.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]) + translate;
+      var newTranslate2 = parseInt(substack2.getSvgRoot().getAttribute("transform").replace("translate(","").split(",")[0]) + translate;
+      d = d + " H" + pd[2] + Blockly.utils.pathBetween(substack1, null, newTranslate1)
+        + " H" + pd[5] + Blockly.utils.pathBetween(substack2, null, newTranslate2)
+        + " H" + pd[7];
+    } else if (block.type.includes("event_when")){
+      d = d ;
+    } else {
+      d = d + " H" + pd[2];
+    }
+    block = block.getNextBlock();
+  }
+  return d;
+};
