@@ -19,19 +19,24 @@ Blockly.WorkspaceHint.prototype.MARGIN_BOTTOM_ = 12;
 Blockly.WorkspaceHint.prototype.MARGIN_SIDE_ = 12;
 Blockly.WorkspaceHint.prototype.HEIGHT_ = 124;
 
+Blockly.WorkspaceHint.prototype.getId = function () {
+    return "workspaceHintId";
+}
+
+Blockly.WorkspaceHint.prototype.getText = function () {
+    return null;
+}
+
 Blockly.WorkspaceHint.prototype.createHint = function () {
     console.log("todo: create hint");
     this.iconGroup_ = this.createHintIcon_();
     this.workspace_.svgGroup_.appendChild(this.iconGroup_);
     this.position();
+
     Blockly.bindEventWithChecks_(
-        this.iconGroup_, 'mouseup', this,
-        function () {
-            console.log("clicked");
-        }
-        // this.iconClick_
-    );
+        this.iconGroup_, 'mousedown', this, this.pathMouseDown_);
 };
+
 
 Blockly.WorkspaceHint.prototype.position = function () {
     this.bottom_ = this.MARGIN_BOTTOM_;
@@ -65,6 +70,13 @@ Blockly.WorkspaceHint.prototype.position = function () {
 
 }
 
+Blockly.WorkspaceHint.prototype.pathMouseDown_ = function(e) {
+    var gesture = this.workspace_.getGesture(e);
+    if (gesture) {
+      gesture.handleWorkspaceHintStart(e, this);
+    }
+  };
+
 Blockly.WorkspaceHint.prototype.createHintIcon_ = function () {
     let iconGroup_ = Blockly.utils.createSvgElement('g', { 'class': 'blocklyIconGroup' }, null);
     let WIDTH_ = 8 * Blockly.BlockSvg.GRID_UNIT;
@@ -82,4 +94,27 @@ Blockly.WorkspaceHint.prototype.createHintIcon_ = function () {
         this.workspace_.options.pathToMedia + lightbulbSvgPath);
 
     return iconGroup_;
+}
+
+Blockly.WorkspaceHint.hintImproveOption = function(hint) {
+    let wsId = hint.workspace_.id;
+    var hintOption = {
+      text: "Help me improve!",
+      enabled: true,
+      callback: function() {
+        console.log("Hint callback to improve get invoked");
+        var event = new Blockly.Events.HintClick(hint, "improve_option_click");
+        event.workspaceId = wsId;
+        Blockly.Events.fire(event);
+      }
+    };
+    return hintOption;
+  };
+
+Blockly.WorkspaceHint.prototype.showContextMenu_ = function (e) {
+    var menuOptions = [];
+    menuOptions.push(Blockly.WorkspaceHint.hintImproveOption(this));
+
+    Blockly.ContextMenu.show(e, menuOptions, this.workspace_.RTL);
+
 }

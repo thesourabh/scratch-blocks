@@ -640,6 +640,8 @@ Blockly.Gesture.prototype.handleRightClick = function(e) {
     this.targetBlock_.showContextMenu_(e);
   } else if (this.startBubble_) {
     this.startBubble_.showContextMenu_(e);
+  } else if (this.startWorkspaceHint_) {
+    this.startWorkspaceHint_.showContextMenu_(e);
   } else if (this.startWorkspace_ && !this.flyout_) {
     Blockly.hideChaff();
     this.startWorkspace_.showContextMenu_(e);
@@ -706,6 +708,14 @@ Blockly.Gesture.prototype.handleBubbleStart = function(e, bubble) {
       'Tried to call gesture.handleBubbleStart, but the gesture had already ' +
       'been started.');
   this.setStartBubble(bubble);
+  this.mostRecentEvent_ = e;
+};
+
+Blockly.Gesture.prototype.handleWorkspaceHintStart = function(e, hint) {
+  goog.asserts.assert(!this.hasStarted_,
+      'Tried to call gesture.handleWorkspaceHintStart, but the gesture had already ' +
+      'been started.');
+  this.setStartWorkspaceHint(hint);
   this.mostRecentEvent_ = e;
 };
 
@@ -815,6 +825,12 @@ Blockly.Gesture.prototype.setStartField = function(field) {
 Blockly.Gesture.prototype.setStartBubble = function(bubble) {
   if (!this.startBubble_) {
     this.startBubble_ = bubble;
+  }
+};
+
+Blockly.Gesture.prototype.setStartWorkspaceHint = function(hint) {
+  if (!this.startHint_) {
+    this.startWorkspaceHint_ = hint;
   }
 };
 
