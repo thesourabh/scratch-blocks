@@ -19,7 +19,7 @@ Blockly.WorkspaceHint.prototype.MARGIN_SIDE_ = 12;
 Blockly.WorkspaceHint.prototype.HEIGHT_ = 124;
 
 Blockly.WorkspaceHint.prototype.getId = function () {
-    return this.id;
+    return this.hintData.id;
 }
 
 /**
@@ -32,7 +32,6 @@ Blockly.WorkspaceHint.prototype.getText = function () {
 Blockly.WorkspaceHint.prototype.setHint = function (hintData) {
     console.log("todo: create hint");
     this.hintData = hintData;
-    this.id = hintData.id;
     this.iconGroup_ = this.createHintIcon_();
     this.workspace_.svgGroup_.appendChild(this.iconGroup_);
     this.position();
