@@ -32,7 +32,7 @@ goog.require('goog.array');
 goog.require('goog.math');
 
 goog.require('Blockly.BlockTransformer');
-
+goog.require('Blockly.WorkspaceHint');
 /**
  * Class for a workspace.  This is a data structure that contains blocks.
  * There is no UI, and can be created headlessly.
@@ -669,6 +669,11 @@ Blockly.Workspace.getById = function(id) {
   return Blockly.Workspace.WorkspaceDB_[id] || null;
 };
 
+Blockly.Workspace.prototype.createHint = function() {
+  this.workspaceHint_ = new Blockly.WorkspaceHint(this);
+}
+
+
 // Export symbols that would otherwise be renamed by Closure compiler.
 Blockly.Workspace.prototype['clear'] = Blockly.Workspace.prototype.clear;
 Blockly.Workspace.prototype['clearUndo'] =
@@ -677,3 +682,4 @@ Blockly.Workspace.prototype['addChangeListener'] =
     Blockly.Workspace.prototype.addChangeListener;
 Blockly.Workspace.prototype['removeChangeListener'] =
     Blockly.Workspace.prototype.removeChangeListener;
+
