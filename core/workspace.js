@@ -119,6 +119,7 @@ Blockly.Workspace = function(opt_options) {
    * BlockTransformer
    */
   this.blockTransformer = new Blockly.BlockTransformer(this);
+  this.workspaceHint = new Blockly.WorkspaceHint(this);
 };
 
 /**
@@ -669,10 +670,24 @@ Blockly.Workspace.getById = function(id) {
   return Blockly.Workspace.WorkspaceDB_[id] || null;
 };
 
-Blockly.Workspace.prototype.createHint = function() {
-  this.workspaceHint_ = new Blockly.WorkspaceHint(this);
+
+Blockly.Workspace.prototype.setHint = function(hintData){
+  if(this.workspaceHint){
+    this.workspaceHint.setHint(hintData);  
+  }
 }
 
+Blockly.Workspace.prototype.hideHint = function(){
+  if(this.workspaceHint){
+    this.workspaceHint.setVisible(false);  
+  }
+}
+
+Blockly.Workspace.prototype.showHint = function(){
+  if(this.workspaceHint){
+    this.workspaceHint.setVisible(true);  
+  }
+}
 
 // Export symbols that would otherwise be renamed by Closure compiler.
 Blockly.Workspace.prototype['clear'] = Blockly.Workspace.prototype.clear;

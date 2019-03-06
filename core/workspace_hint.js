@@ -9,7 +9,6 @@ goog.require('Blockly.Icon');
 
 Blockly.WorkspaceHint = function (workspace) {
     this.workspace_ = workspace;
-    this.createHint();
 };
 
 Blockly.WorkspaceHint.prototype.WIDTH_ = 20;
@@ -20,15 +19,20 @@ Blockly.WorkspaceHint.prototype.MARGIN_SIDE_ = 12;
 Blockly.WorkspaceHint.prototype.HEIGHT_ = 124;
 
 Blockly.WorkspaceHint.prototype.getId = function () {
-    return "workspaceHintId";
+    return this.id;
 }
 
+/**
+ * To be removed, after Blockly.Hint 
+ */
 Blockly.WorkspaceHint.prototype.getText = function () {
     return null;
 }
 
-Blockly.WorkspaceHint.prototype.createHint = function () {
+Blockly.WorkspaceHint.prototype.setHint = function (hintData) {
     console.log("todo: create hint");
+    this.hintData = hintData;
+    this.id = hintData.id;
     this.iconGroup_ = this.createHintIcon_();
     this.workspace_.svgGroup_.appendChild(this.iconGroup_);
     this.position();
@@ -36,6 +40,17 @@ Blockly.WorkspaceHint.prototype.createHint = function () {
     Blockly.bindEventWithChecks_(
         this.iconGroup_, 'mousedown', this, this.pathMouseDown_);
 };
+
+Blockly.WorkspaceHint.prototype.setVisible = function(visible){
+    if(visible){
+        if(!this.iconGroup_ && this.hintData){
+            this.setHint(this.hintData);
+        }
+    }else{
+        goog.dom.removeNode(this.iconGroup_);
+        this.iconGroup_ = null;
+    }
+}
 
 
 Blockly.WorkspaceHint.prototype.position = function () {
