@@ -708,6 +708,10 @@ Blockly.WorkspaceSvg.prototype.resize = function() {
   if (this.scrollbar) {
     this.scrollbar.resize();
   }
+  if (this.workspaceHint_) {
+    this.workspaceHint_.position();
+  }
+
   this.updateScreenCalculations_();
 };
 
