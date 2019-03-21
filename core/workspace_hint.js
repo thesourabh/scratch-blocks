@@ -13,9 +13,9 @@ Blockly.WorkspaceHint = function (workspace) {
 
 Blockly.WorkspaceHint.prototype.WIDTH_ = 20;
 Blockly.WorkspaceHint.prototype.HEIGHT_ = 20;
-Blockly.WorkspaceHint.prototype.MARGIN_TOP_ = 30;
+Blockly.WorkspaceHint.prototype.MARGIN_TOP_ = 80;
 Blockly.WorkspaceHint.prototype.MARGIN_BOTTOM_ = 12;
-Blockly.WorkspaceHint.prototype.MARGIN_SIDE_ = 12;
+Blockly.WorkspaceHint.prototype.MARGIN_SIDE_ = 20;
 Blockly.WorkspaceHint.prototype.HEIGHT_ = 124;
 
 Blockly.WorkspaceHint.prototype.getId = function () {
