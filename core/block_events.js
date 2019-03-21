@@ -543,7 +543,7 @@ Blockly.Events.HintClick = function(hint, interactionType) {
     return;  // Blank event to be populated by fromJson.
   }
   Blockly.Events.HintClick.superClass_.constructor.call(this);
-  this.hintId = hint.getText();
+  this.hintId = hint.getText()||hint.getId();
   this.recordUndo = false;
   this.interactionType = interactionType;
 };
